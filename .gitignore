@@ -1,0 +1,2 @@
+# Escludere la cartella node_modules per evitare di pusharla su GihHub
+node_modules/

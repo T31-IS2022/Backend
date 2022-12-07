@@ -1,0 +1,27 @@
+{
+  "name": "t31-backend",
+  "version": "1.0.0",
+  "description": "Parte di backend del progetto del gruppo T31 - Corso di Ingegneria del software 2022",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/T31-IS2022/Backend.git"
+  },
+  "author": "Gruppo T31",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/T31-IS2022/Backend/issues"
+  },
+  "homepage": "https://github.com/T31-IS2022/Backend#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^6.8.0"
+  }
+}
