@@ -1,2 +1,5 @@
 # Escludere la cartella node_modules per evitare di pusharla su GihHub
 node_modules/
+
+# Escludere il file .env per evitare di pubblicare informazioni riservate
+.env
