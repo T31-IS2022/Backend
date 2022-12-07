@@ -1,0 +1,3 @@
+username database: appUser
+password:   JHTkkCFEAVUvnwRX
+URI:        mongodb+srv://appUser:<password>@progettois2022.zskuscr.mongodb.net/?retryWrites=true&w=majority
