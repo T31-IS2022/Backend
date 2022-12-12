@@ -83,7 +83,7 @@ const Ricorrenza = mongoose.model("Ricorrenza", schemaRicorrenza);
 const Prenotazione = mongoose.model("Prenotazione", schemaPrenotazione);
 const Pagamento = mongoose.model("Pagamento", schemaPagamento);
 const Utente = mongoose.model("Utente", schemaUtente);
-const metodoPagamento = mongoose.model(
+const MetodoPagamento = mongoose.model(
     "MetodoPagamento",
     schemaMetodoPagamento
 );
