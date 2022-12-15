@@ -12,6 +12,8 @@ app.listen(process.env.PORT, () =>
 );
 
 //aggiungere routes
+const routesUtente = require("./routes/utente");
+app.use("/utente", routesUtente);
 
 //MONGODB
 //importo mongoose
@@ -19,7 +21,7 @@ const mongoose = require("mongoose");
 
 //collegamento al database
 mongoose.connect(
-    process.env.DB_URI,
+    process.env.MONGODB_URI,
     { useNewUrlParser: true, useUnifiedTopology: true },
     (err) => {
         if (err)
