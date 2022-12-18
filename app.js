@@ -19,7 +19,7 @@ const mongoose = require("mongoose");
 
 //collegamento al database
 mongoose.connect(
-    process.env.DB_URI,
+    process.env.MONGODB_URI,
     { useNewUrlParser: true, useUnifiedTopology: true },
     (err) => {
         if (err)
