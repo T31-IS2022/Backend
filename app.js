@@ -12,6 +12,8 @@ app.listen(process.env.PORT, () =>
 );
 
 //aggiungere routes
+const routesSpazio = require("./routes/spazio");
+app.use("/spazio", routesSpazio);
 
 //MONGODB
 //importo mongoose
