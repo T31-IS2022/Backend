@@ -11,13 +11,12 @@ const router = express.Router();
 const controllerSpazio = require("../controllers/spazio");
 
 //creo le mie routes con la funzione di callback definita nel controller
-router.post("/login", upload.none(), controllerSpazio.);
-router.post("/signup", upload.none(), controllerSpazio.);
-router.get("/byEmail", controllerSpazio.);
-router.get("/byID", controllerSpazio.);
-router.get("/utente", controllerSpazio.);
-router.patch("/utente/:id", upload.none(), controllerSpazio.);
-router.delete("/utente/:id", controllerSpazio.);
+router.get("/spazio", controllerSpazio.listaSpazi);
+router.get("/byID", controllerSpazio.getSpazioConID);
+router.get("/disponibilita", controllerSpazio.getDisponibilitaPeriodo);
+router.post("/spazio", upload.none(), controllerSpazio.creaSpazio);
+router.patch("/spazio/:id", upload.none(), controllerSpazio.modificaSpazio);
+router.delete("/spazio/:id", controllerSpazio.cancellaSpazio);
 
 //esporto le routes per poterle usare nella mia applicazione
 module.exports = router;

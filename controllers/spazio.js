@@ -1,12 +1,13 @@
 //includo il modello dello spazio per poterlo usare qui
 const Spazio = require("../models/spazio");
+//const Ricorrenza = require("../models/ricorrenza");       //serve per trovare la disponibilità dello spazio
 
 //includo l'ObjectId per poter cercare elementi tramite il loro ID
 var ObjectId = require("mongodb").ObjectID;
 
 //FUNZIONI PER LE VARIE ROUTES
 
-//restituisce tutti gli utenti
+//restituisce tutti gli spazi
 const listaSpazi = (req, res) => {
     console.log(
         "Richiesta una lista di spazi\n\tQuery: " + JSON.stringify(req.query)
@@ -27,6 +28,54 @@ const listaSpazi = (req, res) => {
         .limit(count);
 };
 
+//restituisce le info di uno spazio dato l'ID
+const getSpazioConID = (req, res) => {
+    console.log(
+        "Richiesto uno spazio tramite ID\n\tQuery: " +
+            JSON.stringify(req.query) +
+            "\n\tParametri: " +
+            JSON.stringify(req.params)
+    );
+
+    //prendo l'ID dello spazio dai parametri della richiesta
+    let id = req.query.id;
+    //cerco e restituisco lo spazio con quell'ID'
+    Spazio.findOne({ _id: ObjectId(id) }, (err, data) => {
+        if (err || !data) {
+            return res.status(404).json({
+                message: "Lo spazio richiesto non esiste",
+            });
+        } else return res.status(200).json(data); //se trovo l'oggetto lo restituisco
+    });
+};
+
+//restituisce lo status dello spazio nel periodo indicato
+const getDisponibilitaPeriodo = (req, res) => {
+    console.log(
+        "Richiesta la disponibilità di uno spazio\n\tQuery: " +
+            JSON.stringify(req.query) +
+            "\n\tParametri: " +
+            JSON.stringify(req.params)
+    );
+
+    //prendo l'ID dello spazio e le date dai parametri della richiesta
+    let id = req.query.id;
+    let inizio = req.query.inizio;
+    let fine = req.query.fine;
+    //cerco lo spazio con quell'ID
+    Spazio.findOne({ _id: ObjectId(id) }, (err, data) => {
+        if (err || !data) {
+            return res
+                .status(404)
+                .json({ message: "Lo spazio richiesto non esiste" });
+        } else {
+            //TODO prelevare tutte le ricorrenze nel periodo richiesto e vedere se lo spazio compare tra quelli prenotati
+
+            return res.json(data);
+        }
+    });
+};
+
 //creazione di un nuovo spazio
 const creaSpazio = (req, res) => {
     //stampo le info sulla richiesta
@@ -36,7 +85,7 @@ const creaSpazio = (req, res) => {
     Spazio.findOne({ nome: req.body.nome }, (err, data) => {
         if (!data) {
             //se non l'ho inserito creo un nuovo spazio con i dati provenienti dalla richiesta
-            const nuovoSpazio = new Utente({
+            const nuovoSpazio = new Spazio({
                 nome: req.body.nome,
                 descrizione: req.body.descrizione,
                 tipologia: req.body.tipologia,
@@ -72,48 +121,6 @@ const creaSpazio = (req, res) => {
     });
 };
 
-//restituisce le info di uno utente data l'email
-const getUtenteConEmail = (req, res) => {
-    console.log(
-        "Richiesto un utente tramite email\n\tQuery: " +
-            JSON.stringify(req.query) +
-            "\n\tParametri: " +
-            JSON.stringify(req.params)
-    );
-
-    //prendo l'email dell'utente dai parametri della richiesta
-    let email = req.query.email;
-    //cerco e restituisco l'utente con quella email
-    Utente.findOne({ email: email }, (err, data) => {
-        if (err || !data) {
-            return res
-                .status(404)
-                .json({ message: "L'utente richiesto non esiste" });
-        } else return res.json(data); //se trovo l'oggetto lo restituisco
-    });
-};
-
-//restituisce le info di uno spazio dato l'ID
-const getSpazioConID = (req, res) => {
-    console.log(
-        "Richiesto uno spazio tramite ID\n\tQuery: " +
-            JSON.stringify(req.query) +
-            "\n\tParametri: " +
-            JSON.stringify(req.params)
-    );
-
-    //prendo l'ID dello spazio dai parametri della richiesta
-    let id = req.query.ID;
-    //cerco e restituisco lo spazio con quell'ID'
-    Spazio.findOne({ _id: ObjectId(id) }, (err, data) => {
-        if (err || !data) {
-            return res.status(404).json({
-                message: "Lo spazio richiesto non esiste",
-            });
-        } else return res.status(200).json(data); //se trovo l'oggetto lo restituisco
-    });
-};
-
 //modifica le informazioni di uno spazio dato l'ID
 const modificaSpazio = (req, res) => {
     console.log(
@@ -123,7 +130,7 @@ const modificaSpazio = (req, res) => {
     //prendo l'ID dello spazio dai parametri della richiesta
     let id = req.params.id;
 
-    //cerco e modifico lo spazio con quella email
+    //cerco e modifico lo spazio con quell'ID
     Spazio.findOne({ _id: ObjectId(id) }, (err, data) => {
         if (err || !data) {
             return res
@@ -148,33 +155,33 @@ const modificaSpazio = (req, res) => {
     });
 };
 
-//elimina un utente dato l'ID
-const cancellaUtente = (req, res) => {
+//elimina uno spazio dato l'ID
+const cancellaSpazio = (req, res) => {
     console.log(
-        "Eliminazione di un utente\n\tParametri: " + JSON.stringify(req.params)
+        "Eliminazione di uno spazio\n\tParametri: " + JSON.stringify(req.params)
     );
 
-    //prendo l'ID dell'utente dai parametri della richiesta
+    //prendo l'ID dello spazio dai parametri della richiesta
     let id = req.params.id;
 
-    //prima di eliminarlo verifico che l'utente esista
-    Utente.findOne({ _id: ObjectId(id) }, (err, data) => {
+    //prima di eliminarlo verifico che lo spazio esista
+    Spazio.findOne({ _id: ObjectId(id) }, (err, data) => {
         if (err || !data) {
             return res
                 .status(403)
-                .json({ message: "L'utente richiesto non esiste" });
+                .json({ message: "Lo spazio richiesto non esiste" });
         } else {
-            //cerco ed elimino l'utente con quell'ID
-            Utente.deleteOne({ _id: ObjectId(id) }, (err) => {
+            //cerco ed elimino lo spazio con quell'ID
+            Spazio.deleteOne({ _id: ObjectId(id) }, (err) => {
                 if (err) {
                     return res.json({
                         message:
-                            "Errore nell'eliminazione dell'utente. Errore: " +
+                            "Errore nell'eliminazione dello spazio. Errore: " +
                             err,
                     });
                 } else
                     return res.status(403).json({
-                        message: "Utente eliminato correttamente",
+                        message: "Spazio eliminato correttamente",
                     });
             });
         }
@@ -183,11 +190,10 @@ const cancellaUtente = (req, res) => {
 
 //esporto le funzioni per poterle chiamare dalle route
 module.exports = {
-    loginUtente,
-    registrazione,
-    getUtenteConEmail,
-    getUtenteConID,
-    listaUtenti,
-    modificaUtente,
-    cancellaUtente,
+    listaSpazi,
+    getSpazioConID,
+    getDisponibilitaPeriodo,
+    creaSpazio,
+    modificaSpazio,
+    cancellaSpazio,
 };
