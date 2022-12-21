@@ -21,7 +21,7 @@ const mongoose = require("mongoose");
 
 //collegamento al database
 mongoose.connect(
-    process.env.MONGODB_URI,
+    process.env.DB_URI,
     { useNewUrlParser: true, useUnifiedTopology: true },
     (err) => {
         if (err)
