@@ -16,7 +16,7 @@ const schemaServizio = new mongoose.Schema({
     tipologia: String,
     prezzoIniziale: positiveNumber,
     prezzoOra: positiveNumber,
-    URLfoto: {type: String, default: "/default/servizio.jpg"},
+    URLfoto: {type: String, default: "images/servizi/default.jpg"},
 },{collection:"servizi"});
 
 const Servizio = mongoose.model("Servizio", schemaServizio);
