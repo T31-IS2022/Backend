@@ -15,10 +15,10 @@ const schemaUtente = new mongoose.Schema({
     email: { type: String, required: true },
     password: { type: String, required: true },
     confermaAccount: { type: Boolean, default: false },
-    metodoPagamento: {type: mongoose.Schema.Types.ObjectId, ref: 'MetodoPagamento' },
+    metodoPagamento: {schemaMetodoPagamento},
     telefono: String,
     indirizzo: String,
-    URLfoto: { type: String, default: "path/alla/foto/placeholder.png" },
+    URLfoto: { type: String, default: "images/utenti/default.png" },
 });
 
 const Utente = mongoose.model("Utente", schemaUtente, "utenti");

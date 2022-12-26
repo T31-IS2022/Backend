@@ -2,7 +2,7 @@
 const Utente = require("../models/utente");
 
 //includo l'ObjectId per poter cercare elementi tramite il loro ID
-var ObjectId = require("mongodb").ObjectID;
+var ObjectId = require("mongodb").ObjectId;
 
 //FUNZIONI PER LE VARIE ROUTES
 
@@ -13,15 +13,22 @@ const listaUtenti = (req, res) => {
     );
 
     //prelevo il numero di utenti da restituire e da quale di essi iniziare
-    let count = req.query.count;
-    let start = req.query.start;
+    let count = parseInt(req.query.count || 50);
+    let start = parseInt(req.query.start || 0);
+
+    if (isNaN(count) || isNaN(start)){
+        return res.status(400).json({message: "start e count devono essere interi"});
+    }
+    if (count<1 || start<0){
+        return res.status(400).json({message: "start deve essere positivo e count maggiore di 0"});
+    }
 
     //cerco gli spazi dando un filtro vuoto per ottenerli tutti
     Utente.find({}, (err, data) => {
         if (err) {
-            return res.json({ Errore: err }); //risposta in caso di errore
+            return res.status(500).json({ Errore: err }); //risposta in caso di errore
         }
-        return res.status(200).json(data); //restituisco i dati di tutti gli spazi
+        return res.status(data?200:204).json(data); //restituisco i dati di tutti gli spazi
     })
         .skip(start)
         .limit(count);
@@ -60,23 +67,40 @@ const loginUtente = (req, res) => {
     });
 };
 
+const logoutUtente = (req,res)=>{
+    return res.status(200).json({message:"not implemented"});
+}
+
 //registrazione di un nuovo utente
 const registrazione = (req, res) => {
     //stampo le info sulla richiesta
     console.log("Nuovo utente\n\tParametri: " + JSON.stringify(req.body));
 
+    const body = req.body;
+    if (!body || !(body.email && body.nome && body.cognome && body.password)){
+        return res.status(400).json({message: "Parametri mancanti"});
+    }
+
+    const nome = body.nome;
+    const cognome = body.cognome;
+    const email = body.email;
+    const password = body.password;
+    const telefono = body.telefono || undefined;
+    const indirizzo = body.indirizzo || undefined;
+    const foto = body.URLfoto || undefined;
+
     //controllo se un utente con questa email è già stato inserito nel database
-    Utente.findOne({ email: req.body.email }, (err, data) => {
+    Utente.findOne({ email: email }, (err, data) => {
         if (!data) {
             //se non l'ho inserito creo un nuovo utente con i dati provenienti dalla richiesta
             const nuovoUtente = new Utente({
-                nome: req.body.nome,
-                cognome: req.body.cognome,
-                email: req.body.email,
-                password: req.body.password,
-                telefono: req.body.telefono,
-                indirizzo: req.body.indirizzo,
-                URLfoto: req.body.URLfoto,
+                nome: nome,
+                cognome: cognome,
+                email: email,
+                password: password,
+                telefono: telefono,
+                indirizzo: indirizzo,
+                URLfoto: foto,
             });
 
             console.log(nuovoUtente);
@@ -84,7 +108,7 @@ const registrazione = (req, res) => {
             //salvo il nuovo utente nel database
             nuovoUtente.save((err, data) => {
                 if (err) {
-                    return res.json({ Errore: err }); //risposta in caso di errore
+                    return res.status(500).json({ Errore: err }); //risposta in caso di errore
                 } else {
                     return res.status(201).json(data); //risposta se l'utente è stato salvato nel database
                 }
@@ -92,10 +116,10 @@ const registrazione = (req, res) => {
         } else {
             //se non è stato inserito controllo se c'è un errore
             if (err) {
-                return res.json("Errore nella registrazione. Errore: " + err);
+                return res.status(500).json("Errore nella registrazione. Errore: " + err);
             } else {
                 //altrimenti rispondo dicendo che l'utente è già stato inserito
-                return res.status(403).json({
+                return res.status(409).json({
                     message: "E' già presente un utente con questa e-mail",
                 });
             }
@@ -113,6 +137,10 @@ const getUtenteConEmail = (req, res) => {
     );
 
     //prendo l'email dell'utente dai parametri della richiesta
+    if (!req.query || !req.query.email){
+        return res.status(400).json({message: "Email non specificata"});
+    }
+
     let email = req.query.email;
     //cerco e restituisco l'utente con quella email
     Utente.findOne({ email: email }, (err, data) => {
@@ -120,7 +148,7 @@ const getUtenteConEmail = (req, res) => {
             return res
                 .status(404)
                 .json({ message: "L'utente richiesto non esiste" });
-        } else return res.json(data); //se trovo l'oggetto lo restituisco
+        } else return res.status(200).json(data); //se trovo l'oggetto lo restituisco
     });
 };
 
@@ -134,8 +162,17 @@ const getUtenteConID = (req, res) => {
     );
 
     //prendo l'ID dell'utente dai parametri della richiesta
-    let id = req.query.ID;
+    if (!req.query || !req.query.id){
+        return res.status(400).json({message: "id non specificato"});
+    }
+
+    let id = req.query.id;
     //cerco e restituisco l'utente con quell'ID'
+
+    if (!ObjectId.isValid(id)){
+        return res.status(400).json({message: "id invalido"});
+    }
+
     Utente.findOne({ _id: ObjectId(id) }, (err, data) => {
         if (err || !data) {
             return res.status(404).json({
@@ -151,8 +188,29 @@ const modificaUtente = (req, res) => {
         "Modifica di un utente\n\tParametri: " + JSON.stringify(req.params)
     );
 
+    if (!req.params || !req.params.id){
+        return res.status(400).json({message: "id non specificato"});
+    }
+
     //prendo l'ID dell'utente dai parametri della richiesta
-    let id = req.params.id;
+    const id = req.params.id;
+
+    if (!ObjectId.isValid(id)){
+        return res.status(400).json({message: "id invalido"});
+    }
+
+    const body = req.body;
+    if (!body || !(body.email && body.nome && body.cognome && body.password)){
+        return res.status(400).json({message: "Parametri mancanti"});
+    }
+
+    const nome = body.nome;
+    const cognome = body.cognome;
+    const email = body.email;
+    const password = body.password;
+    const telefono = body.telefono||undefined;
+    const indirizzo = body.indirizzo||undefined;
+    const foto = body.URLfoto||undefined;
 
     //cerco e modifico l'utente con quella email
     Utente.findOne({ _id: ObjectId(id) }, (err, data) => {
@@ -162,17 +220,17 @@ const modificaUtente = (req, res) => {
                 .json({ message: "L'utente richiesto non esiste" });
         } else {
             //modifiche all'utente
-            data.nome = req.body.nome;
-            data.cognome = req.body.cognome;
-            data.email = req.body.email;
-            data.password = req.body.password;
-            data.telefono = req.body.telefono;
-            data.indirizzo = req.body.indirizzo;
-            data.URLfoto = req.body.URLfoto;
+            data.nome = nome;
+            data.cognome = cognome;
+            data.email = email;
+            data.password = password;
+            data.telefono = telefono;
+            data.indirizzo = indirizzo;
+            data.URLfoto = foto;
 
             //salvo le modifiche
             data.save((err, data) => {
-                if (err) return res.json({ Errore: err }); //risposta in caso di errore
+                if (err) return res.status(500).json({ Errore: err }); //risposta in caso di errore
                 return res.status(200).json(data); //risposta se l'utente è stato salvato nel database
             });
         }
@@ -185,8 +243,16 @@ const cancellaUtente = (req, res) => {
         "Eliminazione di un utente\n\tParametri: " + JSON.stringify(req.params)
     );
 
+    if (!req.params || !req.params.id){
+        return res.status(400).json({message: "id non specificato"});
+    }
+
     //prendo l'ID dell'utente dai parametri della richiesta
-    let id = req.params.id;
+    const id = req.params.id;
+
+    if (!ObjectId.isValid(id)){
+        return res.status(400).json({message: "id invalido"});
+    }
 
     //prima di eliminarlo verifico che l'utente esista
     Utente.findOne({ _id: ObjectId(id) }, (err, data) => {
@@ -198,13 +264,13 @@ const cancellaUtente = (req, res) => {
             //cerco ed elimino l'utente con quell'ID
             Utente.deleteOne({ _id: ObjectId(id) }, (err) => {
                 if (err) {
-                    return res.json({
+                    return res.status(500).json({
                         message:
                             "Errore nell'eliminazione dell'utente. Errore: " +
                             err,
                     });
                 } else
-                    return res.status(403).json({
+                    return res.status(200).json({
                         message: "Utente eliminato correttamente",
                     });
             });
@@ -221,4 +287,5 @@ module.exports = {
     listaUtenti,
     modificaUtente,
     cancellaUtente,
+    logoutUtente,
 };

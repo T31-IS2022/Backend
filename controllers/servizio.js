@@ -1,6 +1,6 @@
 const Servizio = require('../models/servizio');
 const upload = require('multer')();
-var ObjectId = require('mongodb').ObjectID;
+var ObjectId = require('mongodb').ObjectId;
 
 const listaServizi = (req, res)=>{
     console.log(`Richiesta di una lista di servizi \n${JSON.stringify(req.query)}`);
@@ -15,8 +15,6 @@ const listaServizi = (req, res)=>{
         return res.status(400).json({message: "start deve essere positivo e count maggiore di 0"});
     }
     
-
-
     Servizio.find({})
     .skip(start)
     .limit(count)
@@ -24,7 +22,7 @@ const listaServizi = (req, res)=>{
         return res.status(200).json(data);
     })
     .catch(err=>{
-        return res.json({Errore: err});
+        return res.status(500).json({Errore: err});
     });
 };
 
@@ -46,7 +44,7 @@ const getID = (req, res)=>{
         return res.status(200).json(data);
     })
     .catch(err=>{
-        return res.json({Errore: err});
+        return res.status(500).json({Errore: err});
     });
 };
 
@@ -59,7 +57,7 @@ const getDisponibilita = (req, res)=>{
 
     if (!id || !inizio || !fine){
         return res.status(400).json({
-            message: `Parametri mancanti: ${(!id)?"id, ":""+(!inizio)?"inizio, ":""+(!fine)?"fine":""}`
+            message: `Parametri mancanti: ${((!id)?"id, ":"")+((!inizio)?"inizio, ":"")+(!fine)?"fine":""}`
         });
     }
 
@@ -88,7 +86,6 @@ const crea = (req, res)=>{
 
     Servizio.count({nome: nome}).
     then(numero=>{
-        console.log(numero)
         if (numero==0){ 
             const nuovoServizio = new Servizio({
                 nome:nome,
@@ -104,7 +101,7 @@ const crea = (req, res)=>{
                 return res.status(201).json({data});
             })
             .catch(err=>{
-                return res.json({Errore: err});
+                return res.status(500).json({Errore: err});
             });
         }else{
             res.status(409).json({
@@ -113,7 +110,7 @@ const crea = (req, res)=>{
         }
     })
     .catch(err=>{
-        return res.json({Errore: err});
+        return res.status(500).json({Errore: err});
     });
 };
 
@@ -136,38 +133,30 @@ const modifica = (req, res)=>{
         return res.status(400).json({message: "id non specificato"});
     }
 
-    Servizio.count({nome: nome})
-    .then(numero=>{
-        if (numero>0)
-            return res.status(409).json({message: `Esiste già un servizio con il nome '${nome}'`});
-        
-        Servizio.findOne({_id:ObjectId(id)})
-        .then(data=>{
-            if (!data){
-                return res.status(400).json({message: `L'id ${id} non è associato ad alcun servizio`});
-            }
-            data.nome = nome || data.nome;
-            data.descrizione = descrizione || data.descrizione;
-            data.tipologia = tipologia || data.tipologia;
-            data.prezzoIniziale = prezzoIniziale || data.prezzoIniziale;
-            data.prezzoOra = prezzoOra || data.prezzoOra;
-            data.URLfoto = foto || data.URLfoto;
+    Servizio.findOne({_id:ObjectId(id)})
+    .then(data=>{
+        if (!data){
+            return res.status(400).json({message: `L'id ${id} non è associato ad alcun servizio`});
+        }
+        data.nome = nome || data.nome;
+        data.descrizione = descrizione || data.descrizione;
+        data.tipologia = tipologia || data.tipologia;
+        data.prezzoIniziale = prezzoIniziale || data.prezzoIniziale;
+        data.prezzoOra = prezzoOra || data.prezzoOra;
+        data.URLfoto = foto || data.URLfoto;
 
-            data.save()
-            .then(data=>{
-                return res.status(200).json(data);
-            })
-            .catch(err=>{
-                return res.json({Errore: err});
-            });
+        data.save()
+        .then(data=>{
+            return res.status(200).json(data);
         })
         .catch(err=>{
-            return res.json({Errore: err});
+            return res.status(500).json({Errore: err});
         });
     })
     .catch(err=>{
-        return res.json({Errore: err});
+        return res.status(500).json({Errore: err});
     });
+
 
     /*const modificato = Servizio.findOneAndUpdate({_id:ObjectId(id)},
     {$set: {
@@ -198,7 +187,7 @@ const cancella = (req, res)=>{
         res.status(200).json({message: `Servizio con id ${id} eliminato`});
     })
     .catch((err)=>{
-        res.json({Errore: err});
+        res.status(500).json({Errore: err});
     });
 };
 

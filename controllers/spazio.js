@@ -20,7 +20,7 @@ const listaSpazi = (req, res) => {
     //cerco gli spazi dando un filtro vuoto per ottenerli tutti
     Spazio.find({}, (err, data) => {
         if (err) {
-            return res.json({ Errore: err }); //risposta in caso di errore
+            return res.status(500).json({ Errore: err }); //risposta in caso di errore
         }
         return res.status(200).json(data); //restituisco i dati di tutti gli spazi
     })
@@ -71,7 +71,7 @@ const getDisponibilitaPeriodo = (req, res) => {
         } else {
             //TODO prelevare tutte le ricorrenze nel periodo richiesto e vedere se lo spazio compare tra quelli prenotati
 
-            return res.json(data);
+            return res.status(500).json(data);
         }
     });
 };
@@ -92,7 +92,7 @@ const creaSpazio = (req, res) => {
                 prezzoIniziale: req.body.prezzoIniziale,
                 prezzoOra: req.body.prezzoOra,
                 URLfoto: req.body.URLfoto,
-                //TODO aggiungere lista servizi
+                servizi: JSON.parse(req.body.servizi)
             });
 
             console.log(nuovoSpazio);
@@ -100,7 +100,7 @@ const creaSpazio = (req, res) => {
             //salvo il nuovo spazio nel database
             nuovoSpazio.save((err, data) => {
                 if (err) {
-                    return res.json({ Errore: err }); //risposta in caso di errore
+                    return res.status(500).json({ Errore: err }); //risposta in caso di errore
                 } else {
                     return res.status(201).json(data); //risposta se lo spazio è stato salvato nel database
                 }
@@ -108,7 +108,7 @@ const creaSpazio = (req, res) => {
         } else {
             //se non è stato inserito controllo se c'è un errore
             if (err) {
-                return res.json(
+                return res.status(500).json(
                     "Errore nella creazione dello spazio. Errore: " + err
                 );
             } else {
@@ -144,11 +144,11 @@ const modificaSpazio = (req, res) => {
             data.prezzoIniziale = req.body.prezzoIniziale;
             data.prezzoOra = req.body.prezzoOra;
             data.URLfoto = req.body.URLfoto;
-            //TODO aggiungere lista servizi
+            data.servizi = JSON.parse(req.body.servizi);
 
             //salvo le modifiche
             data.save((err, data) => {
-                if (err) return res.json({ Errore: err }); //risposta in caso di errore
+                if (err) return res.status(500).json({ Errore: err }); //risposta in caso di errore
                 return res.status(200).json(data); //risposta se lo spazio è stato salvato nel database
             });
         }
@@ -174,7 +174,7 @@ const cancellaSpazio = (req, res) => {
             //cerco ed elimino lo spazio con quell'ID
             Spazio.deleteOne({ _id: ObjectId(id) }, (err) => {
                 if (err) {
-                    return res.json({
+                    return res.status(500).json({
                         message:
                             "Errore nell'eliminazione dello spazio. Errore: " +
                             err,

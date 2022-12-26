@@ -9,18 +9,6 @@ const positiveNumber = {
     },
 };
 
-const schemaServizio = new mongoose.Schema(
-    {
-        nome: { type: String, required: true },
-        descrizione: String,
-        tipologia: String,
-        prezzoIniziale: positiveNumber,
-        prezzoOra: positiveNumber,
-        URLfoto: { type: String, default: "/images/servizi/default.png" },
-    },
-    { collection: "servizi" }
-);
-
 const schemaSpazio = new mongoose.Schema(
     {
         nome: { type: String, required: true },
@@ -29,11 +17,10 @@ const schemaSpazio = new mongoose.Schema(
         prezzoIniziale: positiveNumber,
         prezzoOra: positiveNumber,
         URLfoto: { type: String, default: "/images/spazi/default.png" },
-        servizi: [schemaServizio],
-    },
-    { collection: "spazi" }
+        servizi: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Servizio' }]
+    }
 );
 
-const Spazio = mongoose.model("Spazio", schemaSpazio);
+const Spazio = mongoose.model("Spazio", schemaSpazio, "spazi");
 
 module.exports = Spazio;

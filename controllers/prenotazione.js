@@ -140,17 +140,15 @@ const nuovaPrenotazione = async (req, res) => {
     console.log("Nuova prenotazione\n\tParametri: " + JSON.stringify(req.body));
 
     // array di nuove ricorrenze da inserire nel db
-    let nuoveRicorrenze = req.body.ricorrenze;
-    console.log("nuove ricorrenze: " + nuoveRicorrenze)
-
-    // array di ObjectId delle ricorrenze inserite nel db
-    let nuoveRicorrenzeObj = [];
+    let nuoveRicorrenze = JSON.parse(req.body.ricorrenze);
+    console.log("nuove ricorrenze: " + nuoveRicorrenze);
 
     // inserisce le ricorrenze nel db e salva gli ObjectId
+    const promises=[];
     for(let i=0; i<nuoveRicorrenze.length; i++){
-        let ricorrenza = nuoveRicorrenze[i];
+        const ricorrenza = nuoveRicorrenze[i];
 
-        let nuovaRicorrenza = new Ricorrenza({
+        const nuovaRicorrenza = new Ricorrenza({
             inizio: ricorrenza.inizio,
             fine: ricorrenza.fine,
             spaziPrenotati: ricorrenza.spaziPrenotati,
@@ -158,32 +156,33 @@ const nuovaPrenotazione = async (req, res) => {
         });
 
         // utilizzo di Promise invece che callback per salvare le ricorrenze una alla volta
-        try{
-            let ricorrenzaSalvata = await nuovaRicorrenza.save();
-                
-            if(ricorrenzaSalvata){
-                console.log("aggiunta nuova ricorrenza:\n" + ricorrenzaSalvata)
-                nuoveRicorrenzeObj.push(ricorrenzaSalvata._id);
-            }
-
-        } catch(err){ console.log("Errore salvando una ricorrenza:\n" + err); }
+        promises.push(nuovaRicorrenza.save());            
+        /*if(ricorrenzaSalvata){
+            console.log("aggiunta nuova ricorrenza:\n" + ricorrenzaSalvata)
+            nuoveRicorrenzeObjId.push(ricorrenzaSalvata._id);
+        }*/
     }
-
-    const nuovaPrenotazione = new Prenotazione({
-        proprietario: req.body.proprietario,
-        pagamento: req.body.pagamento,
-        ricorrenze: nuoveRicorrenzeObj,
-        eventoCollegato: req.body.eventoCollegato
+    Promise.all(promises)
+    .then(ricorrenzeInserite=>{
+        const idInseriti = ricorrenzeInserite.map(ricorrenza=>{
+            return ricorrenza._id;
+        });
+        const nuovaPrenotazione = new Prenotazione({
+            proprietario: req.body.proprietario,
+            pagamento: req.body.pagamento,
+            ricorrenze: idInseriti,
+            eventoCollegato: req.body.eventoCollegato
+        });
+        nuovaPrenotazione.save((err, data) => {
+            if(err){
+                return res.status(400).json(err);
+            }
+            else{
+                return res.status(201).json(data);
+            }
+        });
     });
 
-    nuovaPrenotazione.save((err, data) => {
-        if(err){
-            return res.sendStatus(400).json(err);
-        }
-        else{
-            return res.sendStatus(201);
-        }
-    });
 }
 
 

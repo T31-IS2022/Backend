@@ -24,8 +24,9 @@ const routesUtente = require("./routes/utente");
 app.use("/utente", routesUtente);
 
 //metto express in ascolto sulla porta specificata nel file .env
-app.listen(process.env.PORT || 3000, () =>
-    console.log("App in ascolto sulla porta " + process.env.PORT)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+    console.log("App in ascolto sulla porta " + PORT)
 );
 
 //MONGODB

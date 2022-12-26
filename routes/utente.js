@@ -12,12 +12,13 @@ const controllerUtente = require("../controllers/utente");
 
 //creo le mie routes con la funzione di callback definita nel controller
 router.post("/login", upload.none(), controllerUtente.loginUtente);
+router.get("/logout", controllerUtente.logoutUtente);
 router.post("/signup", upload.none(), controllerUtente.registrazione);
 router.get("/byEmail", controllerUtente.getUtenteConEmail);
 router.get("/byID", controllerUtente.getUtenteConID);
-router.get("/utente", controllerUtente.listaUtenti);
-router.patch("/utente/:id", upload.none(), controllerUtente.modificaUtente);
-router.delete("/utente/:id", controllerUtente.cancellaUtente);
+router.get("/", controllerUtente.listaUtenti);
+router.patch("/:id", upload.none(), controllerUtente.modificaUtente);
+router.delete("/:id", controllerUtente.cancellaUtente);
 
 //esporto le routes per poterle usare nella mia applicazione
 module.exports = router;
