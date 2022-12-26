@@ -12,16 +12,14 @@ app.use(express.json())
 
 app.use(express.urlencoded({extended:false}));
 
-let port = process.env.SERVER_PORT;
+let port = process.env.SERVER_PORT || 3000;
 app.listen(port, () =>
     console.log("App in ascolto sulla porta " + port)
 );
 
 const routesPrenotazione = require("./routes/prenotazione");
-const routesRicorrenza = require("./routes/ricorrenza")
 
 app.use("/prenotazione", routesPrenotazione);
-app.use("/ricorrenza", routesRicorrenza);
 
 //MONGODB
 //importo mongoose
