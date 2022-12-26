@@ -7,13 +7,20 @@ const app = express();
 
 console.log("started application");
 
-let port = process.env.PORT || 3000;
+// middleware per permettere di interpretare il body come raw json 
+app.use(express.json())
+app.use(express.urlencoded({extended:false}));
+
+let port = process.env.SERVER_PORT;
 app.listen(port, () =>
     console.log("App in ascolto sulla porta " + port)
 );
 
 const routesPrenotazione = require("./routes/prenotazione");
+const routesRicorrenza = require("./routes/ricorrenza")
+
 app.use("/prenotazione", routesPrenotazione);
+app.use("/ricorrenza", routesRicorrenza);
 
 //MONGODB
 //importo mongoose

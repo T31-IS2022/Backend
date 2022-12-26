@@ -36,7 +36,7 @@ const schemaSpazio = new mongoose.Schema({
     prezzoIniziale: positiveNumber,
     prezzoOra: positiveNumber,
     URLfoto: { type: String, default: "path/alla/foto/placeholder.png" },
-    servizi: [schemaServizio],
+    servizi: [{type: mongoose.Schema.Types.ObjectId, ref: 'Servizio' }],
 });
 
 const schemaEvento = new mongoose.Schema({
@@ -52,8 +52,8 @@ const schemaEvento = new mongoose.Schema({
 const schemaRicorrenza = new mongoose.Schema({
     inizio: { type: Date, required: true },
     fine: { type: Date, required: true },
-    spaziPrenotati: [schemaSpazio],
-    serviziPrenotati: [schemaServizio],
+    spaziPrenotati: [{type: mongoose.Schema.Types.ObjectId, ref: 'Spazio' }],
+    serviziPrenotati: [{type: mongoose.Schema.Types.ObjectId, ref: 'Servizio' }],
 });
 
 const schemaUtente = new mongoose.Schema({
@@ -69,17 +69,17 @@ const schemaUtente = new mongoose.Schema({
 });
 
 const schemaPrenotazione = new mongoose.Schema({
-    proprietario: schemaUtente,
-    pagamento: schemaMetodoPagamento,
-    ricorrenze: [schemaRicorrenza],
-    eventoCollegato: schemaEvento,
+    proprietario: {type: mongoose.Schema.Types.ObjectId, ref: 'Utente' },
+    pagamento: {type: mongoose.Schema.Types.ObjectId, ref: 'MetodoPagamento' },
+    ricorrenze: [{type: mongoose.Schema.Types.ObjectId, ref: 'Ricorrenza' }],
+    eventoCollegato: {type: mongoose.Schema.Types.ObjectId, ref: 'Evento' },
 });
 
 
 
 //converto lo schema in un modello
 
-const Prenotazione = mongoose.model("Prenotazione", schemaPrenotazione);
+const Prenotazione = mongoose.model("Prenotazione", schemaPrenotazione, "prenotazioni");
 
 
 //esporto il modello per poterlo usare nei controller
