@@ -17,6 +17,9 @@ app.use("/prenotazione", routesPrenotazione);
 const routesRicorrenza = require("./routes/ricorrenza")
 app.use("/ricorrenza", routesRicorrenza);
 
+const routesSpazio = require("./routes/spazio");
+app.use("/spazio", routesSpazio);
+
 
 //metto express in ascolto sulla porta specificata nel file .env
 app.listen(process.env.PORT || 3000, () =>
