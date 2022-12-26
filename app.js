@@ -16,10 +16,8 @@ app.listen(port, () =>
     console.log("App in ascolto sulla porta " + port)
 );
 
-const routesPrenotazione = require("./routes/prenotazione");
 const routesRicorrenza = require("./routes/ricorrenza")
 
-app.use("/prenotazione", routesPrenotazione);
 app.use("/ricorrenza", routesRicorrenza);
 
 //MONGODB
