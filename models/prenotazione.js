@@ -10,6 +10,14 @@ const positiveNumber = {
     },
 };
 
+const schemaMetodoPagamento = new mongoose.Schema({
+    nome: String,
+    circuito: String,
+    IBAN: String,
+    scadenza: Date,
+    CVV: String,
+});
+
 //schema del servizio
 const schemaServizio = new mongoose.Schema({
     nome: { type: String, required: true },
@@ -28,7 +36,7 @@ const schemaSpazio = new mongoose.Schema({
     prezzoIniziale: positiveNumber,
     prezzoOra: positiveNumber,
     URLfoto: { type: String, default: "path/alla/foto/placeholder.png" },
-    servizi: [schemaServizio],
+    servizi: [{type: mongoose.Schema.Types.ObjectId, ref: 'Servizio' }],
 });
 
 const schemaEvento = new mongoose.Schema({
@@ -44,15 +52,8 @@ const schemaEvento = new mongoose.Schema({
 const schemaRicorrenza = new mongoose.Schema({
     inizio: { type: Date, required: true },
     fine: { type: Date, required: true },
-    spaziPrenotati: [schemaSpazio],
-    serviziPrenotati: [schemaServizio],
-});
-
-const schemaPrenotazione = new mongoose.Schema({
-    proprietario: schemaUtente,
-    pagamento: schemaPagamento,
-    ricorrenze: [schemaRicorrenza],
-    eventoCollegato: schemaEvento,
+    spaziPrenotati: [{type: mongoose.Schema.Types.ObjectId, ref: 'Spazio' }],
+    serviziPrenotati: [{type: mongoose.Schema.Types.ObjectId, ref: 'Servizio' }],
 });
 
 const schemaUtente = new mongoose.Schema({
@@ -67,26 +68,19 @@ const schemaUtente = new mongoose.Schema({
     URLfoto: { type: String, default: "path/alla/foto/placeholder.png" },
 });
 
-const schemaMetodoPagamento = new mongoose.Schema({
-    nome: String,
-    circuito: String,
-    IBAN: String,
-    scadenza: Date,
-    CVV: String,
+const schemaPrenotazione = new mongoose.Schema({
+    proprietario: {type: mongoose.Schema.Types.ObjectId, ref: 'Utente' },
+    pagamento: {type: mongoose.Schema.Types.ObjectId, ref: 'MetodoPagamento' },
+    ricorrenze: [{type: mongoose.Schema.Types.ObjectId, ref: 'Ricorrenza' }],
+    eventoCollegato: {type: mongoose.Schema.Types.ObjectId, ref: 'Evento' },
 });
 
+
+
 //converto lo schema in un modello
-const Servizio = mongoose.model("Servizio", schemaServizio);
-const Spazio = mongoose.model("Spazio", schemaSpazio);
-const Evento = mongoose.model("Evento", schemaEvento);
-const Ricorrenza = mongoose.model("Ricorrenza", schemaRicorrenza);
-const Prenotazione = mongoose.model("Prenotazione", schemaPrenotazione);
-const Pagamento = mongoose.model("Pagamento", schemaPagamento);
-const Utente = mongoose.model("Utente", schemaUtente);
-const MetodoPagamento = mongoose.model(
-    "MetodoPagamento",
-    schemaMetodoPagamento
-);
+
+const Prenotazione = mongoose.model("Prenotazione", schemaPrenotazione, "prenotazioni");
+
 
 //esporto il modello per poterlo usare nei controller
-module.exports = Space;
+module.exports = Prenotazione;
