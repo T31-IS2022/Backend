@@ -1,17 +1,27 @@
-//includo dotenv per poter utilizzare comodamente un file con parametri impostabili
 require("dotenv").config();
 
-const express = require("express"); //includo express
+// aggiunge le routes all'applicazione
+
+const express = require("express")
 const app = express();
 
-console.log("App avviata");
+console.log("started application");
 
-//metto express in ascolto sulla porta specificata nel file .env
-app.listen(process.env.PORT, () =>
-    console.log("App in ascolto sulla porta " + process.env.PORT)
+// middleware per permettere di interpretare il body come raw json 
+app.use(express.json())
+
+app.use(express.urlencoded({extended:false}));
+
+let port = process.env.SERVER_PORT;
+app.listen(port, () =>
+    console.log("App in ascolto sulla porta " + port)
 );
 
-//aggiungere routes
+const routesPrenotazione = require("./routes/prenotazione");
+const routesRicorrenza = require("./routes/ricorrenza")
+
+app.use("/prenotazione", routesPrenotazione);
+app.use("/ricorrenza", routesRicorrenza);
 
 //MONGODB
 //importo mongoose
