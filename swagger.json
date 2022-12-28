@@ -1,0 +1,69 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Progetto Gruppo T31 - IS2022",
+        "description": "API del progetto del Gruppo T31 svolto durente il corso di Ingegneria del software - Anno Accademico 2022/23",
+        "contact": {
+            "email": [
+                "luca.dematte-2@studenti.unitn.it",
+                "diego.oniarti@studenti.unitn.it"
+            ]
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "host": "localhost:3000",
+    "basePath": "/",
+    "tags": [
+        {
+            "name": "Utenti",
+            "description": "API per gli utenti del sistema"
+        },
+        {
+            "name": "Spazi",
+            "description": "API per gli spazi del sistema"
+        },
+        {
+            "name": "Servizi",
+            "description": "API per i servizi del sistema"
+        },
+        {
+            "name": "Prenotazioni",
+            "description": "API per le prenotazioni del sistema"
+        }
+    ],
+    "schemes": ["http"],
+    "paths": {
+        "/utente": {
+            "get": {
+                "tags": ["utente"],
+                "summary": "Ottenere la lista di utenti presenti nel sistema",
+                "description": "",
+                "operationId": "listaUtenti",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Utente"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Utente": {
+            "required": ["title"],
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
