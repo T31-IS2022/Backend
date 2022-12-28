@@ -1,16 +1,17 @@
 const express = require("express")
+const {tokenChecker: tokenChecker} = require("../scripts/authentication");
 
 const router = express.Router();
 
 const upload = require("multer")();
 
-const controllerPrenotazione = require("../controllers/prenotazione")
+const controllerPrenotazione = require("../controllers/prenotazione");
 
-router.get("/byID", controllerPrenotazione.getPrenotazioneConID)
-router.post("/", upload.none(), controllerPrenotazione.nuovaPrenotazione)
-router.delete("/eliminaPrenotazione/:id", controllerPrenotazione.eliminaPrenotazione)
-router.get("/getRicorrenzePrenotazione", controllerPrenotazione.getRicorrenzePrenotazione)
-router.patch("/modificaPrenotazione", controllerPrenotazione.modificaPrenotazione)
-router.get("/getPrenotazioniUtente", controllerPrenotazione.getPrenotazioniUtente)
+router.get("/byID", tokenChecker(1), controllerPrenotazione.getPrenotazioneConID);
+router.post("/", upload.none(), tokenChecker(1), controllerPrenotazione.nuovaPrenotazione);
+router.delete("/eliminaPrenotazione/:id", tokenChecker(1), controllerPrenotazione.eliminaPrenotazione);
+router.get("/getRicorrenzePrenotazione", tokenChecker(1), controllerPrenotazione.getRicorrenzePrenotazione);
+router.patch("/modificaPrenotazione", tokenChecker(1), controllerPrenotazione.modificaPrenotazione);
+router.get("/getPrenotazioniUtente", tokenChecker(1), controllerPrenotazione.getPrenotazioniUtente);
 
 module.exports = router;

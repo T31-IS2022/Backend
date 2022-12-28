@@ -18,6 +18,7 @@ const schemaUtente = new mongoose.Schema({
     metodoPagamento: {schemaMetodoPagamento},
     telefono: String,
     indirizzo: String,
+    livello: {type: Number, default: 1}, //1=utente normale, 2=segreteria
     URLfoto: { type: String, default: "images/utenti/default.png" },
 });
 

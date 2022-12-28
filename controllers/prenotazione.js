@@ -32,18 +32,22 @@ const getPrenotazioneConID = (req, res) => {
 
     let id = req.query.id;
 
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
+
     // populate Object nested in array ( ricorrenze[i].spaziPrenotati e ricorrenze[i].serviziPrenotati)
-    Prenotazione.findOne({ _id: ObjectID(id)})
-                .populate(populateSpazi)
-                .populate(populateRicorrenze)
-                .exec((err, data) => {
-                    if(err || !data){
-                        return res.status(404).json({
-                            message: "La prenotazione non esiste",
-                        })
-                    }
-                    else return res.status(200).json(data);
-                });
+    Prenotazione
+    .findOne({ _id: ObjectID(id)})
+    .populate(populateSpazi)
+    .populate(populateRicorrenze)
+    .exec((err, data) => {
+        if(err || !data){
+            return res.status(404).json({
+                message: "La prenotazione non esiste",
+            })
+        }
+        else return res.status(200).json(data);
+    });
 }
 
 // get prenotazioni di un utente
@@ -56,6 +60,9 @@ const getPrenotazioniUtente = (req, res) => {
     );
 
     let id = req.query.id;
+
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
 
     Utente.findOne({_id: ObjectID(id)}, (err, data) =>{
         if(err || !data){
@@ -86,6 +93,9 @@ const getRicorrenzePrenotazione = (req, res) => {
     );
 
     const id = req.query.id;
+
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
 
     Prenotazione.findOne({ _id: ObjectID(id)})
                 .populate(populateSpazi)
@@ -196,6 +206,9 @@ const modificaPrenotazione = (req, res) => {
 
     let id = req.params.id;
 
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
+
     Prenotazione.findOne({ _id: ObjectID(id) }, (err, data) =>{
         if(err || !data){
             return res.status(404).json({ message: "La prenotazione non esiste"});
@@ -226,6 +239,9 @@ const eliminaPrenotazione = (req, res) => {
     );
 
     let id = req.params.id;
+
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
 
     Prenotazione.findOne({_id: ObjectID(id)}, (err, data) => {
         if(err || !data){

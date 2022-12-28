@@ -1,4 +1,5 @@
 const express = require("express"); //includo express
+const {tokenChecker: tokenChecker} = require("../scripts/authentication");
 
 //includo multer per poter leggere i dati dello spazio dal form
 const multer = require("multer");
@@ -11,14 +12,15 @@ const router = express.Router();
 const controllerUtente = require("../controllers/utente");
 
 //creo le mie routes con la funzione di callback definita nel controller
-router.post("/login", upload.none(), controllerUtente.loginUtente);
-router.get("/logout", controllerUtente.logoutUtente);
-router.post("/signup", upload.none(), controllerUtente.registrazione);
-router.get("/byEmail", controllerUtente.getUtenteConEmail);
-router.get("/byID", controllerUtente.getUtenteConID);
-router.get("/", controllerUtente.listaUtenti);
-router.patch("/:id", upload.none(), controllerUtente.modificaUtente);
-router.delete("/:id", controllerUtente.cancellaUtente);
+router.post("/login",   upload.none(),      controllerUtente.loginUtente);
+router.get("/logout",                       controllerUtente.logoutUtente);
+router.post("/signup",  upload.none(),      controllerUtente.registrazione);
+router.get("/byEmail",  tokenChecker(1),    controllerUtente.getUtenteConEmail);
+router.get("/byID",     tokenChecker(2),    controllerUtente.getUtenteConID);
+router.get("/",         tokenChecker(2),    controllerUtente.listaUtenti);
+router.patch("/:id",    tokenChecker(1),    upload.none(), controllerUtente.modificaUtente);
+router.delete("/:id",   tokenChecker(1),    controllerUtente.cancellaUtente);
+router.get("/conferma", controllerUtente.confermaUtente);
 
 //esporto le routes per poterle usare nella mia applicazione
 module.exports = router;

@@ -14,6 +14,10 @@ const getRicorrenzaConID = (req, res) => {
     // parametro nell'url ?id= . . .
     let id = req.query.id;
 
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
+
+
     Ricorrenza.findOne({ _id: ObjectID(id)})
               .populate('spaziPrenotati')
               .populate('serviziPrenotati')
@@ -36,6 +40,9 @@ const eliminaRicorrenza = (req, res) => {
     // htpps://...route.../:id
     let id = req.params.id;
 
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
+
     Ricorrenza.findOneAndDelete({_id: ObjectID(id)}, (err, data) => {
         if(err){
             return res.status(404).json({
@@ -55,6 +62,9 @@ const modificaRicorrenza = (req, res) => {
     );
 
     let id = req.params.id;
+
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
 
     Ricorrenza.findOne({ _id: ObjectID(id) }, (err, data) =>{
         if(err || !data){

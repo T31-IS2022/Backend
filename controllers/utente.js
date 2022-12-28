@@ -1,8 +1,16 @@
 //includo il modello dello spazio per poterlo usare qui
 const Utente = require("../models/utente");
-
+const jwt = require('jsonwebtoken');
+const {servizioMail: servizioMail} = require('../scripts/email');
 //includo l'ObjectId per poter cercare elementi tramite il loro ID
 var ObjectId = require("mongodb").ObjectId;
+
+function generaToken(data){
+    return jwt.sign(
+        {data}, 
+        process.env.JWT_KEY,
+        {expiresIn: 86400});
+}
 
 //FUNZIONI PER LE VARIE ROUTES
 
@@ -58,14 +66,43 @@ const loginUtente = (req, res) => {
     //TODO implementare controllo di sicurezza
 
     //cerco e restituisco l'utente con quella email e quella password
-    Utente.findOne({ email: email, password: password }, (err, data) => {
+    Utente.findOne({ email: email, password: password, confermaAccount: true }, (err, data) => {
         if (err || !data) {
             return res.status(401).json({ message: "Email o password errati" });
         } else {
-            return res.status(200).json(data); //se trovo l'oggetto lo restituisco
+            token = generaToken(data);
+            return res.status(200).json({token: token}); 
         }
     });
 };
+
+const confermaUtente = (req,res)=>{
+    const id = req.query.id;
+    if (!id){
+        return res.status(400).json({message: "Parametro mancante: id"});
+    }
+    if (!ObjectId.isValid(id)){
+        return res.status(400).json({message: "id invalido"});
+    }
+
+    Utente.findOne({_id: ObjectId(id)})
+    .then(data=>{
+        if (!data){
+            res.status(404).json({message: `L'id '${id}' non corrisponde a nessun utente`});
+        }
+        data.confermaAccount=true;
+        data.save()
+        .then(data=>{
+            return res.status(200).json({message: `L'utente con l'id '${id}' è stato confermato`});
+        })
+        .catch(err=>{
+            return res.status(500).json({Errore: err})
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({Errore: err})
+    });
+}
 
 const logoutUtente = (req,res)=>{
     return res.status(200).json({message:"not implemented"});
@@ -110,6 +147,19 @@ const registrazione = (req, res) => {
                 if (err) {
                     return res.status(500).json({ Errore: err }); //risposta in caso di errore
                 } else {
+                    const id = data._id;
+                    servizioMail.sendMail({
+                        from: `t31 <noreply.${process.env.EMAIL_ADDR}>`,
+                        replyTo: `noreply.${process.env.EMAIL_ADDR}`,
+                        to: email,
+                        subject: "Conferma account Makako",
+                        text: "Conferma il tuo account Makako per poter utilizzare il tuo account",
+                        html: `<h1>Conferma il tuo account Makako</h1><p>Attiva ora l'account ${nome} ${cognome}</p><br/><a href="${process.env.WEB_ADDR}/utente/conferma?id=${id}">Conferma!</a>`
+                    }).then(info=>{
+                        console.log(info);
+                    }).catch(err=>{
+                        console.log(err);
+                    });
                     return res.status(201).json(data); //risposta se l'utente è stato salvato nel database
                 }
             });
@@ -142,14 +192,18 @@ const getUtenteConEmail = (req, res) => {
     }
 
     let email = req.query.email;
-    //cerco e restituisco l'utente con quella email
-    Utente.findOne({ email: email }, (err, data) => {
-        if (err || !data) {
-            return res
-                .status(404)
-                .json({ message: "L'utente richiesto non esiste" });
-        } else return res.status(200).json(data); //se trovo l'oggetto lo restituisco
-    });
+    if (req.utente.livello>=2 || req.utente.email==email){
+        //cerco e restituisco l'utente con quella email
+        Utente.findOne({ email: email }, (err, data) => {
+            if (err || !data) {
+                return res
+                    .status(404)
+                    .json({ message: "L'utente richiesto non esiste" });
+            } else return res.status(200).json(data); //se trovo l'oggetto lo restituisco
+        });
+    }else{
+        return res.start(403).json({message: "Untente non autorizzato"});
+    }
 };
 
 //restituisce le info di uno utente dato l'ID
@@ -204,6 +258,9 @@ const modificaUtente = (req, res) => {
         return res.status(400).json({message: "Parametri mancanti"});
     }
 
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
+
     const nome = body.nome;
     const cognome = body.cognome;
     const email = body.email;
@@ -254,6 +311,9 @@ const cancellaUtente = (req, res) => {
         return res.status(400).json({message: "id invalido"});
     }
 
+    if (req.utente.livello<2 && req.utente._id != id)
+        return res.status(403).json({message: "Utente non autorizzato"});
+
     //prima di eliminarlo verifico che l'utente esista
     Utente.findOne({ _id: ObjectId(id) }, (err, data) => {
         if (err || !data) {
@@ -288,4 +348,5 @@ module.exports = {
     modificaUtente,
     cancellaUtente,
     logoutUtente,
+    confermaUtente
 };
