@@ -1,4 +1,6 @@
 const Servizio = require('../models/servizio');
+const Ricorrenza = require('../models/ricorrenza');
+
 const upload = require('multer')();
 var ObjectId = require('mongodb').ObjectId;
 
@@ -52,16 +54,42 @@ const getDisponibilita = (req, res)=>{
     console.log(`Richiesta della disponibilità di uno spazio in un certo periodo \n${JSON.stringify(req.query)}`);
     
     const id = req.query.id;
-    const inizio = req.query.fine;
+    const inizio = req.query.inizio;
     const fine = req.query.fine;
 
     if (!id || !inizio || !fine){
         return res.status(400).json({
-            message: `Parametri mancanti: ${((!id)?"id, ":"")+((!inizio)?"inizio, ":"")+(!fine)?"fine":""}`
+            message: `Parametri mancanti: ${((!id)?"id, ":"")+((!inizio)?"inizio, ":"")+((!fine)?"fine":"")}`
         });
     }
 
-    // Qui dobbiamo capire per bene come gestire i servizi nella prenotazione
+    if (!ObjectId.isValid(id)){
+        return res.status(400).json({message: `L'id '${id}' non è valido`});
+    }
+
+    Servizio.count({_id: ObjectId(id)})
+    .then(numero=>{
+        if(numero==0){
+            return res.status(404).json({message: `L'id '${id}' non corrisppnde a nessun servizio`});
+        }
+        const dataInizio = new Date(inizio);
+        const dataFine = new Date(fine);
+        //
+        Ricorrenza.count({inizio:{$lt: dataFine}, fine:{$gt: dataInizio}, serviziPrenotati: {$elemMatch: {$eq: ObjectId(id)}}})
+        .then(numero=>{
+            if (numero==0){
+                return res.status(200).json({message: `Il servizio ${id} è diponibile nel periodo tra ${inizio} e ${fine}`});
+            }else{
+                return res.status(200).json({message: `Il servizio ${id} NON è diponibile nel periodo tra ${inizio} e ${fine}`});
+            }
+        })
+        .catch(err=>{
+            return res.status(500).json({Errore: err})
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({Errore: err})
+    });
 };
 
 const crea = (req, res)=>{
