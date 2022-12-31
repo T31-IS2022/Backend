@@ -187,11 +187,13 @@
                             "properties": {
                                 "code": {
                                     "type": "integer",
-                                    "description": "Codice di risposta HTTP"
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 200
                                 },
                                 "message": {
                                     "type": "string",
-                                    "description": "Messaggio con esito dell'operazione"
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "L'utente con l'id <ID utente> è stato confermato"
                                 }
                             }
                         }
@@ -486,11 +488,13 @@
                             "properties": {
                                 "code": {
                                     "type": "integer",
-                                    "description": "Codice di risposta HTTP"
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 200
                                 },
                                 "message": {
                                     "type": "string",
-                                    "description": "Messaggio con esito dell'operazione"
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Utente eliminato correttamente"
                                 }
                             }
                         }
@@ -506,6 +510,399 @@
                     },
                     "404": {
                         "description": "Not found - Un utente con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/spazio": {
+            "post": {
+                "tags": ["spazio"],
+                "summary": "Creazione di un nuovo spazio",
+                "description": "",
+                "operationId": "creaSpazio",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "nome",
+                        "in": "formData",
+                        "description": "Nome del nuovo spazio",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "descrizione",
+                        "in": "formData",
+                        "description": "Breve descrizione del nuovo spazio",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "tipologia",
+                        "in": "formData",
+                        "description": "Tipo di spazio",
+                        "type": "string",
+                        "enum": [
+                            "Locale interno",
+                            "Locale attrezzato",
+                            "Spazio esterno"
+                        ],
+                        "required": true
+                    },
+                    {
+                        "name": "prezzoIniziale",
+                        "in": "formData",
+                        "description": "Prezzo dello spazio quando viene utilizzato",
+                        "type": "number",
+                        "format": "float",
+                        "required": true
+                    },
+                    {
+                        "name": "prezzoOra",
+                        "in": "formData",
+                        "description": "Prezzo dello spazio per ogni ora di utilizzo",
+                        "type": "number",
+                        "format": "float",
+                        "required": true
+                    },
+                    {
+                        "name": "URLfoto",
+                        "in": "formData",
+                        "description": "Percorso della foto del nuovo spazio",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "servizi",
+                        "in": "formData",
+                        "description": "Lista di ID dei servizi che possono essere utilizzati in questo spazio",
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created - Creazione spazio effettuata correttamente",
+                        "schema": { "$ref": "#/definitions/Spazio" }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            },
+            "get": {
+                "tags": ["spazio"],
+                "summary": "Ottenere la lista degli spazi presenti nel sistema",
+                "description": "",
+                "operationId": "listaSpazi",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "description": "Indice del primo oggetto da restituire",
+                        "type": "integer",
+                        "required": false
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Numero di oggetti da restituire",
+                        "type": "integer",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/Spazio" }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I valori di start e count non sono coerenti"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/spazio/byID": {
+            "get": {
+                "tags": ["spazio"],
+                "summary": "Ottenere uno spazio tramite il suo ID",
+                "description": "",
+                "operationId": "getSpazioConID",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID dello spazio da restituire",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": { "$ref": "#/definitions/Spazio" }
+                    },
+                    "404": {
+                        "description": "Not found - Uno spazio con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/spazio/disponibilita": {
+            "get": {
+                "tags": ["spazio"],
+                "summary": "Specificando una data di inizio e di fine, viene restituita la disponibilità (true o false) dello spazio richiesto nel periodo specificato",
+                "description": "",
+                "operationId": "getDisponibilitaPeriodo",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID dello spazio da restituire",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "inizio",
+                        "in": "query",
+                        "description": "Data di inizio del periodo",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": true
+                    },
+                    {
+                        "name": "fine",
+                        "in": "query",
+                        "description": "Data di fine del periodo",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 200
+                                },
+                                "disponibilita": {
+                                    "type": "boolean",
+                                    "description": "Disponibilità dello spazio nel periodo richiesto",
+                                    "example": true
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Il servizio <ID servizio> è diponibile nel periodo tra <Data inizio> e <Data fine>"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti"
+                    },
+                    "404": {
+                        "description": "Not found - Uno spazio con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/spazio/{id}": {
+            "patch": {
+                "tags": ["spazio"],
+                "summary": "Modifica di uno spazio",
+                "description": "",
+                "operationId": "modificaSpazio",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID dello spazio da modificare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "nome",
+                        "in": "formData",
+                        "description": "Nome dello spazio",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "descrizione",
+                        "in": "formData",
+                        "description": "Breve descrizione dello spazio",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "tipologia",
+                        "in": "formData",
+                        "description": "Tipo di spazio",
+                        "type": "string",
+                        "enum": [
+                            "Locale interno",
+                            "Locale attrezzato",
+                            "Spazio esterno"
+                        ],
+                        "required": true
+                    },
+                    {
+                        "name": "prezzoIniziale",
+                        "in": "formData",
+                        "description": "Prezzo dello spazio quando viene utilizzato",
+                        "type": "number",
+                        "format": "float",
+                        "required": true
+                    },
+                    {
+                        "name": "prezzoOra",
+                        "in": "formData",
+                        "description": "Prezzo dello spazio per ogni ora di utilizzo",
+                        "type": "number",
+                        "format": "float",
+                        "required": true
+                    },
+                    {
+                        "name": "URLfoto",
+                        "in": "formData",
+                        "description": "Percorso della foto dello spazio",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "servizi",
+                        "in": "formData",
+                        "description": "Lista di ID dei servizi che possono essere utilizzati in questo spazio",
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Modifica spazio effettuata correttamente",
+                        "schema": { "$ref": "#/definitions/Spazio" }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["spazio"],
+                "summary": "Eliminazione di uno spazio",
+                "description": "",
+                "operationId": "eliminaSpazio",
+                "consumes": [""],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID dello spazio da eliminare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Eliminazione dello spazio effettuata correttamente",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 200
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Spazio eliminato correttamente"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Uno spazio con l'ID fornito non esiste"
                     },
                     "500": {
                         "description": "Internal server error - Errore imprevisto durante l'operazione"
@@ -574,6 +971,65 @@
                     "type": "integer",
                     "description": "Livello di privilegio dell'utente: 0 -> non registrato, 1 -> utente standard, 2 -> utente di segreteria",
                     "example": 1
+                }
+            }
+        },
+        "Spazio": {
+            "type": "object",
+            "required": [
+                "_id",
+                "nome",
+                "tipologia",
+                "prezzoIniziale",
+                "prezzoOra"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string",
+                    "description": "Identificativo univoco dello spazio"
+                },
+                "nome": {
+                    "type": "string",
+                    "description": "Nome dello spazio",
+                    "example": "Sala polifunzionale"
+                },
+                "descrizione": {
+                    "type": "string",
+                    "description": "Breve descrizione del nuovo spazio",
+                    "example": "Aula molto grande (100 posti) per spettacoli, conferenze, ..."
+                },
+                "tipologia": {
+                    "type": "string",
+                    "description": "Tipo di spazio",
+                    "enum": [
+                        "Locale interno",
+                        "Locale attrezzato",
+                        "Spazio esterno"
+                    ],
+                    "example": "Locale interno"
+                },
+                "prezzoIniziale": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Prezzo dello spazio quando viene utilizzato",
+                    "example": 10.5
+                },
+                "prezzoOra": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Prezzo dello spazio per ogni ora di utilizzo",
+                    "example": 4.25
+                },
+                "URLfoto": {
+                    "type": "string",
+                    "description": "Percorso della foto dello spazio",
+                    "example": "images/spazi/default.png"
+                },
+                "servizi": {
+                    "type": "array",
+                    "description": "Lista di ID dei servizi che possono essere utilizzati in questo spazio",
+                    "items": { "type": "string" },
+                    "required": false
                 }
             }
         }

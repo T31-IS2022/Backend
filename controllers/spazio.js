@@ -1,9 +1,9 @@
 //includo il modello dello spazio per poterlo usare qui
 const Spazio = require("../models/spazio");
-//const Ricorrenza = require("../models/ricorrenza");       //serve per trovare la disponibilità dello spazio
+const Ricorrenza = require("../models/ricorrenza"); //serve per trovare la disponibilità dello spazio
 
 //includo l'ObjectId per poter cercare elementi tramite il loro ID
-var ObjectId = require("mongodb").ObjectID;
+var ObjectId = require("mongodb").ObjectId;
 
 //FUNZIONI PER LE VARIE ROUTES
 
@@ -20,7 +20,7 @@ const listaSpazi = (req, res) => {
     //cerco gli spazi dando un filtro vuoto per ottenerli tutti
     Spazio.find({}, (err, data) => {
         if (err) {
-            return res.status(500).json({ code:500, message: err }); //risposta in caso di errore
+            return res.status(500).json({ code: 500, message: err }); //risposta in caso di errore
         }
         return res.status(200).json(data); //restituisco i dati di tutti gli spazi
     })
@@ -41,11 +41,10 @@ const getSpazioConID = (req, res) => {
     let id = req.query.id;
     //cerco e restituisco lo spazio con quell'ID'
     Spazio.findOne({ _id: ObjectId(id) }, (err, data) => {
-        if (err)
-            return res.status(500).json({code:500, message: err});
+        if (err) return res.status(500).json({ code: 500, message: err });
         if (!data) {
             return res.status(404).json({
-                code:404,
+                code: 404,
                 message: "Lo spazio richiesto non esiste",
             });
         } else return res.status(200).json(data); //se trovo l'oggetto lo restituisco
@@ -75,17 +74,29 @@ const getDisponibilitaPeriodo = (req, res) => {
             //TODO prelevare tutte le ricorrenze nel periodo richiesto e vedere se lo spazio compare tra quelli prenotati
             const dataInizio = new Date(inizio);
             const dataFine = new Date(fine);
-            Ricorrenza.count({inizio:{$lt: dataFine}, fine:{$gt: dataInizio}, spaziPrenotati: {$elemMatch: {$eq: ObjectId(id)}}})
-            .then(numero=>{
-                if (numero==0){
-                    return res.status(200).json({code: 200, dispobinilita:true, message: `Il servizio ${id} è diponibile nel periodo tra ${inizio} e ${fine}`});
-                }else{
-                    return res.status(200).json({code: 200, dispobinilita:false, message: `Il servizio ${id} NON è diponibile nel periodo tra ${inizio} e ${fine}`});
-                }
+            Ricorrenza.count({
+                inizio: { $lt: dataFine },
+                fine: { $gt: dataInizio },
+                spaziPrenotati: { $elemMatch: { $eq: ObjectId(id) } },
             })
-            .catch(err=>{
-                return res.status(500).json({code:500, message: err})
-            });
+                .then((numero) => {
+                    if (numero == 0) {
+                        return res.status(200).json({
+                            code: 200,
+                            dispobinilita: true,
+                            message: `Il servizio ${id} è diponibile nel periodo tra ${inizio} e ${fine}`,
+                        });
+                    } else {
+                        return res.status(200).json({
+                            code: 200,
+                            dispobinilita: false,
+                            message: `Il servizio ${id} NON è diponibile nel periodo tra ${inizio} e ${fine}`,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    return res.status(500).json({ code: 500, message: err });
+                });
         }
     });
 };
@@ -97,8 +108,7 @@ const creaSpazio = (req, res) => {
 
     //controllo se uno spazio con questo nome è già stato inserito nel database
     Spazio.findOne({ nome: req.body.nome }, (err, data) => {
-        if (err)
-            return res.status(500).json({code:500, message: err});
+        if (err) return res.status(500).json({ code: 500, message: err });
         if (!data) {
             //se non l'ho inserito creo un nuovo spazio con i dati provenienti dalla richiesta
             const nuovoSpazio = new Spazio({
@@ -108,7 +118,7 @@ const creaSpazio = (req, res) => {
                 prezzoIniziale: req.body.prezzoIniziale,
                 prezzoOra: req.body.prezzoOra,
                 URLfoto: req.body.URLfoto,
-                servizi: JSON.parse(req.body.servizi)
+                servizi: JSON.parse(req.body.servizi),
             });
 
             console.log(nuovoSpazio);
@@ -116,9 +126,9 @@ const creaSpazio = (req, res) => {
             //salvo il nuovo spazio nel database
             nuovoSpazio.save((err, data) => {
                 if (err) {
-                    return res.status(500).json({code:500,messaggo: err }); //risposta in caso di errore
+                    return res.status(500).json({ code: 500, messaggo: err }); //risposta in caso di errore
                 } else {
-                    return res.status(201).json({code:201, message:data}); //risposta se lo spazio è stato salvato nel database
+                    return res.status(201).json({ code: 201, message: data }); //risposta se lo spazio è stato salvato nel database
                 }
             });
         } else {
@@ -142,8 +152,7 @@ const modificaSpazio = (req, res) => {
 
     //cerco e modifico lo spazio con quell'ID
     Spazio.findOne({ _id: ObjectId(id) }, (err, data) => {
-        if (err)
-            return res.status(500).json({code:500, message: err})
+        if (err) return res.status(500).json({ code: 500, message: err });
         if (!data) {
             return res
                 .status(404)
@@ -160,7 +169,8 @@ const modificaSpazio = (req, res) => {
 
             //salvo le modifiche
             data.save((err, data) => {
-                if (err) return res.status(500).json({code:500, message: err }); //risposta in caso di errore
+                if (err)
+                    return res.status(500).json({ code: 500, message: err }); //risposta in caso di errore
                 return res.status(200).json(data); //risposta se lo spazio è stato salvato nel database
             });
         }
@@ -178,21 +188,20 @@ const cancellaSpazio = (req, res) => {
 
     //prima di eliminarlo verifico che lo spazio esista
     Spazio.findOne({ _id: ObjectId(id) }, (err, data) => {
-        if (err)
-            return res.status(500).json({code:500, message: err})
+        if (err) return res.status(500).json({ code: 500, message: err });
 
         if (!data) {
             return res
-                .status(403)
-                .json({ code:403, message: "Lo spazio richiesto non esiste" });
+                .status(404)
+                .json({ code: 404, message: "Lo spazio richiesto non esiste" });
         } else {
             //cerco ed elimino lo spazio con quell'ID
             Spazio.deleteOne({ _id: ObjectId(id) }, (err) => {
                 if (err)
-                    return res.status(500).json({code:500, message: err})
-        
-                return res.status(403).json({
-                    code: 403,
+                    return res.status(500).json({ code: 500, message: err });
+
+                return res.status(200).json({
+                    code: 200,
                     message: "Spazio eliminato correttamente",
                 });
             });
