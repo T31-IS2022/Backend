@@ -5,10 +5,8 @@
         "title": "Progetto Gruppo T31 - IS2022",
         "description": "API del progetto del Gruppo T31 svolto durente il corso di Ingegneria del software - Anno Accademico 2022/23",
         "contact": {
-            "email": [
-                "luca.dematte-2@studenti.unitn.it",
-                "diego.oniarti@studenti.unitn.it"
-            ]
+            "name": "Luca Dematté - Referente gruppo T31",
+            "email": "luca.dematte-2@studenti.unitn.it"
         },
         "license": {
             "name": "MIT",
@@ -19,38 +17,498 @@
     "basePath": "/",
     "tags": [
         {
-            "name": "Utenti",
+            "name": "utente",
             "description": "API per gli utenti del sistema"
         },
         {
-            "name": "Spazi",
+            "name": "spazio",
             "description": "API per gli spazi del sistema"
         },
         {
-            "name": "Servizi",
+            "name": "servizio",
             "description": "API per i servizi del sistema"
         },
         {
-            "name": "Prenotazioni",
+            "name": "prenotazione",
             "description": "API per le prenotazioni del sistema"
         }
     ],
     "schemes": ["http"],
     "paths": {
-        "/utente": {
+        "/utente/registrazione": {
+            "post": {
+                "tags": ["utente"],
+                "summary": "Creazione di un nuovo account utente",
+                "description": "",
+                "operationId": "registrazione",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "nome",
+                        "in": "formData",
+                        "description": "Nome del nuovo utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "cognome",
+                        "in": "formData",
+                        "description": "Cognome del nuovo utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "Email del nuovo utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "Password del nuovo utente",
+                        "type": "string",
+                        "format": "password",
+                        "required": true
+                    },
+                    {
+                        "name": "telefono",
+                        "in": "formData",
+                        "description": "Contatto telefonico del nuovo utente",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "indirizzo",
+                        "in": "formData",
+                        "description": "Indirizzo del nuovo utente, per l'invio di eventuali comunicazioni scritte",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "URLfoto",
+                        "in": "formData",
+                        "description": "Percorso della foto profilo del nuovo utente",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created - Registrazione effettuata correttamente",
+                        "schema": { "$ref": "#/definitions/Utente" }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "409": {
+                        "description": "Conflict - E' già presente un utente con l'email specificata"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/utente/login": {
+            "post": {
+                "tags": ["utente"],
+                "summary": "Accesso al sistema",
+                "description": "",
+                "operationId": "login",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "Email dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "Password dell'utente",
+                        "type": "string",
+                        "format": "password",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Login effettuato correttamente",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "token": {
+                                    "type": "string",
+                                    "description": "Token di accesso dell'utente"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati oppure l'utente deve confermare la sua registrazione"
+                    },
+                    "404": {
+                        "description": "Not found - Un utente con l'email fornita non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/utente/conferma": {
             "get": {
                 "tags": ["utente"],
-                "summary": "Ottenere la lista di utenti presenti nel sistema",
+                "summary": "Conferma registrazione dell'account",
                 "description": "",
-                "operationId": "listaUtenti",
-                "consumes": ["application/json"],
+                "operationId": "confermaAccount",
+                "consumes": [],
                 "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID dell'utente che sta confermando la registrazione",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/Utente"
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP"
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione"
+                                }
+                            }
                         }
+                    },
+                    "400": {
+                        "description": "Bad request - ID non specificato o non valido"
+                    },
+                    "404": {
+                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/utente": {
+            "get": {
+                "tags": ["utente"],
+                "summary": "Ottenere la lista degli utenti presenti nel sistema",
+                "description": "",
+                "operationId": "listaUtenti",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "description": "Indice del primo oggetto da restituire",
+                        "type": "integer",
+                        "required": false
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Numero di oggetti da restituire",
+                        "type": "integer",
+                        "required": false
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/Utente" }
+                        }
+                    },
+                    "204": {
+                        "description": "No content - Nessun utente da restituire"
+                    },
+                    "400": {
+                        "description": "Bad request - I valori di start e count non sono coerenti"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/utente/byID": {
+            "get": {
+                "tags": ["utente"],
+                "summary": "Ottenere un utente tramite il suo ID",
+                "description": "",
+                "operationId": "getUtenteConID",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID dell'utente da restituire",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": { "$ref": "#/definitions/Utente" }
+                    },
+                    "400": {
+                        "description": "Bad request - ID non specificato"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/utente/byEmail": {
+            "get": {
+                "tags": ["utente"],
+                "summary": "Ottenere un utente tramite la sua email",
+                "description": "",
+                "operationId": "getUtenteConEmail",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "Email dell'utente da restituire",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": { "$ref": "#/definitions/Utente" }
+                    },
+                    "400": {
+                        "description": "Bad request - Email non specificata"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Un utente con l'email fornita non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/utente/{id}": {
+            "patch": {
+                "tags": ["utente"],
+                "summary": "Modifica di un utente",
+                "description": "",
+                "operationId": "modificaUtente",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID dell'utente da modificare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "nome",
+                        "in": "formData",
+                        "description": "Nome dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "cognome",
+                        "in": "formData",
+                        "description": "Cognome dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "Email dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "Password dell'utente",
+                        "type": "string",
+                        "format": "password",
+                        "required": true
+                    },
+                    {
+                        "name": "telefono",
+                        "in": "formData",
+                        "description": "Contatto telefonico dell'utente",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "indirizzo",
+                        "in": "formData",
+                        "description": "Indirizzo dell'utente, per l'invio di eventuali comunicazioni scritte",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "URLfoto",
+                        "in": "formData",
+                        "description": "Percorso della foto profilo dell'utente",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Modifica dell'utente effettuata correttamente",
+                        "schema": { "$ref": "#/definitions/Utente" }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["utente"],
+                "summary": "Eliminazione di un utente",
+                "description": "",
+                "operationId": "eliminaUtente",
+                "consumes": [""],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID dell'utente da eliminare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Eliminazione dell'utente effettuata correttamente",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP"
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
                     }
                 }
             }
@@ -58,10 +516,64 @@
     },
     "definitions": {
         "Utente": {
-            "required": ["title"],
+            "type": "object",
+            "required": [
+                "_id",
+                "nome",
+                "cognome",
+                "email",
+                "confermaAccount",
+                "livello"
+            ],
             "properties": {
-                "title": {
-                    "type": "string"
+                "_id": {
+                    "type": "string",
+                    "description": "Identificativo univoco dell'utente"
+                },
+                "nome": {
+                    "type": "string",
+                    "description": "Nome dell'utente",
+                    "example": "Mario"
+                },
+                "cognome": {
+                    "type": "string",
+                    "description": "Cognome dell'utente",
+                    "example": "Rossi"
+                },
+                "email": {
+                    "type": "string",
+                    "description": "Email utilizzata per la creazione dell'account",
+                    "example": "mario.rossi@mail.com"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Password dell'utente",
+                    "example": "<password>"
+                },
+                "telefono": {
+                    "type": "string",
+                    "description": "Contatto telefonico dell'utente",
+                    "example": "1234567890"
+                },
+                "indirizzo": {
+                    "type": "string",
+                    "description": "Indirizzo dell'utente, per l'invio di eventuali comunicazioni scritte",
+                    "example": "via Roma 34, 20122 Milano"
+                },
+                "URLfoto": {
+                    "type": "string",
+                    "description": "Percorso della foto profilo dell'utente",
+                    "example": "images/utenti/default.png"
+                },
+                "confermaAccount": {
+                    "type": "boolean",
+                    "description": "Status dell'account dell'utente, se false allora l'utente deve ancora confermare la registrazione",
+                    "example": true
+                },
+                "livello": {
+                    "type": "integer",
+                    "description": "Livello di privilegio dell'utente: 0 -> non registrato, 1 -> utente standard, 2 -> utente di segreteria",
+                    "example": 1
                 }
             }
         }
