@@ -9,9 +9,9 @@ const controllerPrenotazione = require("../controllers/prenotazione");
 
 router.get("/byID", tokenChecker(1), controllerPrenotazione.getPrenotazioneConID);
 router.post("/", upload.none(), tokenChecker(1), controllerPrenotazione.nuovaPrenotazione);
-router.delete("/eliminaPrenotazione/:id", tokenChecker(1), controllerPrenotazione.eliminaPrenotazione);
-router.get("/getRicorrenzePrenotazione", tokenChecker(1), controllerPrenotazione.getRicorrenzePrenotazione);
-router.patch("/modificaPrenotazione", tokenChecker(1), controllerPrenotazione.modificaPrenotazione);
-router.get("/getPrenotazioniUtente", tokenChecker(1), controllerPrenotazione.getPrenotazioniUtente);
+router.delete("/:id", tokenChecker(1), controllerPrenotazione.eliminaPrenotazione);
+router.get("/ricorrenze", tokenChecker(1), controllerPrenotazione.getRicorrenzePrenotazione);
+router.patch("/:id", tokenChecker(1), controllerPrenotazione.modificaPrenotazione);
+router.get("/byUtente", tokenChecker(1), controllerPrenotazione.getPrenotazioniUtente);
 
 module.exports = router;

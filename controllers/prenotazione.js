@@ -30,10 +30,10 @@ const getPrenotazioneConID = (req, res) => {
         JSON.stringify(req.params)
     );
 
-    let id = req.query.id;
+    const id = req.query.id;
 
     if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({message: "Utente non autorizzato"});
+        return res.status(403).json({code:403, message: "Utente non autorizzato"});
 
     // populate Object nested in array ( ricorrenze[i].spaziPrenotati e ricorrenze[i].serviziPrenotati)
     Prenotazione
@@ -41,12 +41,14 @@ const getPrenotazioneConID = (req, res) => {
     .populate(populateSpazi)
     .populate(populateRicorrenze)
     .exec((err, data) => {
-        if(err || !data){
+        if (err)
+            return res.status(500).json({code:500, message: err});
+        if(!data)
             return res.status(404).json({
+                code:404,
                 message: "La prenotazione non esiste",
             })
-        }
-        else return res.status(200).json(data);
+        return res.status(200).json(data);
     });
 }
 
@@ -62,24 +64,26 @@ const getPrenotazioniUtente = (req, res) => {
     let id = req.query.id;
 
     if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({message: "Utente non autorizzato"});
+        return res.status(403).json({code:403, message: "Utente non autorizzato"});
 
     Utente.findOne({_id: ObjectID(id)}, (err, data) =>{
-        if(err || !data){
+        if (err)
+            return res.status(500).json({code:500, message: err});
+        if(!data)
             return res.status(404).json({
+                code:404,
                 message: "Utente non esiste"
             });
-            
-        }
-        else{
-            // trova le prenotazioni dell'utente e le ritorna
-            Prenotazione.find({ proprietario: id})
-                        .populate(populateSpazi)
-                        .populate(populateRicorrenze)
-                        .exec((err, data) => {
-                            return res.status(200).json(data);
-                        }); 
-        }
+        // trova le prenotazioni dell'utente e le ritorna
+        Prenotazione
+        .find({ proprietario: id})
+        .populate(populateSpazi)
+        .populate(populateRicorrenze)
+        .exec((err, data) => {
+            if (err)
+                return res.status(500).json({code:500, message: err});
+            return res.status(200).json(data);
+        });     
     });
 }
 
@@ -95,19 +99,22 @@ const getRicorrenzePrenotazione = (req, res) => {
     const id = req.query.id;
 
     if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({message: "Utente non autorizzato"});
+        return res.status(403).json({code: 403, message: "Utente non autorizzato"});
 
-    Prenotazione.findOne({ _id: ObjectID(id)})
-                .populate(populateSpazi)
-                .populate(populateRicorrenze)
-                .exec((err, data) => {
-                    if(err || !data){
-                        return res.status(404).json({
-                            message: "La prenotazione non esiste",
-                        });
-                    }
-                    else return res.status(200).json(data.ricorrenze);
-                });
+    Prenotazione
+    .findOne({ _id: ObjectID(id)})
+    .populate(populateSpazi)
+    .populate(populateRicorrenze)
+    .exec((err, data) => {
+        if (err)
+            return res.status(500).json({code:500, message: err});
+        if(!data)
+            return res.status(404).json({
+                code:404,
+                message: "La prenotazione non esiste",
+            });
+        return res.status(200).json(data.ricorrenze);
+    });
 }
 
 
@@ -166,7 +173,7 @@ const nuovaPrenotazione = async (req, res) => {
         });
 
         // utilizzo di Promise invece che callback per salvare le ricorrenze una alla volta
-        promises.push(nuovaRicorrenza.save());            
+        promises.push(nuovaRicorrenza.save());
         /*if(ricorrenzaSalvata){
             console.log("aggiunta nuova ricorrenza:\n" + ricorrenzaSalvata)
             nuoveRicorrenzeObjId.push(ricorrenzaSalvata._id);
@@ -184,12 +191,9 @@ const nuovaPrenotazione = async (req, res) => {
             eventoCollegato: req.body.eventoCollegato
         });
         nuovaPrenotazione.save((err, data) => {
-            if(err){
-                return res.status(400).json(err);
-            }
-            else{
-                return res.status(201).json(data);
-            }
+            if (err)
+                return res.status(500).json({code:500, message: err});
+            return res.status(201).json({code:201, message:data});
         });
     });
 
@@ -207,27 +211,26 @@ const modificaPrenotazione = (req, res) => {
     let id = req.params.id;
 
     if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({message: "Utente non autorizzato"});
+        return res.status(403).json({code:403, message: "Utente non autorizzato"});
 
     Prenotazione.findOne({ _id: ObjectID(id) }, (err, data) =>{
-        if(err || !data){
-            return res.status(404).json({ message: "La prenotazione non esiste"});
-        }
-        else{
-            // modifica la prenotazione
-            data.proprietario = req.body.proprietario;
-            data.pagamento = req.body.pagamento;
-            data.ricorrenze = req.body.ricorrenze; // ricorrenze è array di ObjectId quindi il client non può aggiungere ricorrenze (da implementare guarda TODO)
-            data.eventoCollegato = req.body.eventoCollegato;
+        if (err)
+            return res.status(500).json({code:500, message: err});
+        if(!data)
+            return res.status(404).json({code:404, message: "La prenotazione non esiste"});
+        
+        // modifica la prenotazione
+        data.proprietario = req.body.proprietario;
+        data.pagamento = req.body.pagamento;
+        data.ricorrenze = req.body.ricorrenze; // ricorrenze è array di ObjectId quindi il client non può aggiungere ricorrenze (da implementare guarda TODO)
+        data.eventoCollegato = req.body.eventoCollegato;
 
-            data.save((err, data) => {
-                if (err){
-                    return res.json({ Errore: err })
-                }
-                else return res.status(200).json(data);
-                
-            });
-        }
+        data.save((err, data) => {
+            if (err)
+                return res.status(500).json({code:500, message: err});
+            return res.status(200).json(data);
+        });
+    
     });
 }
 
@@ -241,24 +244,21 @@ const eliminaPrenotazione = (req, res) => {
     let id = req.params.id;
 
     if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({message: "Utente non autorizzato"});
+        return res.status(403).json({code: 403, message: "Utente non autorizzato"});
 
     Prenotazione.findOne({_id: ObjectID(id)}, (err, data) => {
-        if(err || !data){
+        if (err)
+            return res.status(500).json({code:500, message: err});
+        if(!data)
             return res.status(404).json({
+                code:404,
                 message: "La prenotazione non esiste",
             });
-        }
-        else{
-            Prenotazione.deleteOne({_id: ObjectID(id)}, (err, data) => {
-                if(err){
-                    return res.json(err);
-                }
-                else{
-                    return res.status(200).json(data);
-                }
-            });
-        }
+        Prenotazione.deleteOne({_id: ObjectID(id)}, (err, data) => {
+            if (err)
+                return res.status(500).json({code:500, message: err});
+            return res.status(200).json(data);
+        });        
     });
 }
 

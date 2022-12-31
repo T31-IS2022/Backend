@@ -15,20 +15,23 @@ const getRicorrenzaConID = (req, res) => {
     let id = req.query.id;
 
     if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({message: "Utente non autorizzato"});
+        return res.status(403).json({code:403, message: "Utente non autorizzato"});
 
-
-    Ricorrenza.findOne({ _id: ObjectID(id)})
-              .populate('spaziPrenotati')
-              .populate('serviziPrenotati')
-              .exec((err, data) => {
-                if(err || !data){
-                    return res.status(404).json({
-                        message: "La ricorrenza non esiste",
-                    });
-                }
-                else return res.status(200).json(data);
-              });
+    Ricorrenza
+    .findOne({ _id: ObjectID(id)})
+    .populate('spaziPrenotati')
+    .populate('serviziPrenotati')
+    .exec((err, data) => {
+        if (err)
+            return res.status(500).json({code:500, message: err});
+        if(!data)
+            return res.status(404).json({
+                code:404,
+                message: "La ricorrenza non esiste",
+            });
+    
+        return res.status(200).json(data);
+    });
 }
 
 // elimina ricorrenza
@@ -41,11 +44,12 @@ const eliminaRicorrenza = (req, res) => {
     let id = req.params.id;
 
     if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({message: "Utente non autorizzato"});
+        return res.status(403).json({code:403, message: "Utente non autorizzato"});
 
     Ricorrenza.findOneAndDelete({_id: ObjectID(id)}, (err, data) => {
         if(err){
             return res.status(404).json({
+                code:400,
                 message: "La ricorrenza non esiste",
             });
         }
@@ -64,11 +68,13 @@ const modificaRicorrenza = (req, res) => {
     let id = req.params.id;
 
     if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({message: "Utente non autorizzato"});
+        return res.status(403).json({code: 403, message: "Utente non autorizzato"});
 
     Ricorrenza.findOne({ _id: ObjectID(id) }, (err, data) =>{
-        if(err || !data){
-            return res.status(404).json({ message: "La ricorrenza non esiste"});
+        if (err)
+            return res.status(500).json({code:500, message: err});
+        if(!data){
+            return res.status(404).json({code:404, message: "La ricorrenza non esiste"});
         }
         else{
             /*
@@ -89,7 +95,7 @@ const modificaRicorrenza = (req, res) => {
 
             data.save((err, data) => {
                 if (err){
-                    return res.status(500).json({ errore: err })
+                    return res.status(500).json({code:500,message: err })
                 }
                 else return res.status(200).json(data);
                 
@@ -109,6 +115,7 @@ const getRicorrenzePerPeriodo = (req, res) => {
 
     if(req.query.inizio > req.query.fine){
         return res.status(400).json({
+            code:400,
             errore: "data di inizio maggiore di data di fine"
         });
     }
@@ -126,7 +133,7 @@ const getRicorrenzePerPeriodo = (req, res) => {
                 .populate('serviziPrenotati')
                 .exec((err, data) => {
                     if(err){
-                        return res.status(500).json({ errore: err})
+                        return res.status(500).json({code:500, errore: err})
                     }
                     else return res.status(200).json(data);
                 });
