@@ -84,13 +84,13 @@ const getDisponibilitaPeriodo = (req, res) => {
                         return res.status(200).json({
                             code: 200,
                             dispobinilita: true,
-                            message: `Il servizio ${id} è diponibile nel periodo tra ${inizio} e ${fine}`,
+                            message: `Lo spazio ${id} è diponibile nel periodo tra ${inizio} e ${fine}`,
                         });
                     } else {
                         return res.status(200).json({
                             code: 200,
                             dispobinilita: false,
-                            message: `Il servizio ${id} NON è diponibile nel periodo tra ${inizio} e ${fine}`,
+                            message: `Lo spazio ${id} NON è diponibile nel periodo tra ${inizio} e ${fine}`,
                         });
                     }
                 })

@@ -522,7 +522,7 @@
                 "tags": ["spazio"],
                 "summary": "Creazione di un nuovo spazio",
                 "description": "",
-                "operationId": "creaSpazio",
+                "operationId": "nuovoSpazio",
                 "consumes": ["multipart/form-data"],
                 "produces": ["application/json"],
                 "parameters": [
@@ -686,7 +686,7 @@
                 "tags": ["spazio"],
                 "summary": "Specificando una data di inizio e di fine, viene restituita la disponibilità (true o false) dello spazio richiesto nel periodo specificato",
                 "description": "",
-                "operationId": "getDisponibilitaPeriodo",
+                "operationId": "getDisponibilitaSpazio",
                 "consumes": [],
                 "produces": ["application/json"],
                 "parameters": [
@@ -733,7 +733,7 @@
                                 "message": {
                                     "type": "string",
                                     "description": "Messaggio con esito dell'operazione",
-                                    "example": "Il servizio <ID servizio> è diponibile nel periodo tra <Data inizio> e <Data fine>"
+                                    "example": "Lo spazio <ID spazio> è diponibile nel periodo tra <Data inizio> e <Data fine>"
                                 }
                             }
                         }
@@ -909,6 +909,386 @@
                     }
                 }
             }
+        },
+        "/servizio": {
+            "post": {
+                "tags": ["servizio"],
+                "summary": "Creazione di un nuovo servizio",
+                "description": "",
+                "operationId": "nuovoServizio",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "nome",
+                        "in": "formData",
+                        "description": "Nome del nuovo servizio",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "descrizione",
+                        "in": "formData",
+                        "description": "Breve descrizione del nuovo servizio",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "tipologia",
+                        "in": "formData",
+                        "description": "Tipo di servizio",
+                        "type": "string",
+                        "enum": [
+                            "Arredamento",
+                            "Attrezzatura specifica",
+                            "Altro"
+                        ],
+                        "required": true
+                    },
+                    {
+                        "name": "prezzoIniziale",
+                        "in": "formData",
+                        "description": "Prezzo del servizio quando viene utilizzato",
+                        "type": "number",
+                        "format": "float",
+                        "required": true
+                    },
+                    {
+                        "name": "prezzoOra",
+                        "in": "formData",
+                        "description": "Prezzo del servizio per ogni ora di utilizzo",
+                        "type": "number",
+                        "format": "float",
+                        "required": true
+                    },
+                    {
+                        "name": "URLfoto",
+                        "in": "formData",
+                        "description": "Percorso della foto del nuovo servizio",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created - Creazione servizio effettuata correttamente",
+                        "schema": { "$ref": "#/definitions/Servizio" }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            },
+            "get": {
+                "tags": ["servizio"],
+                "summary": "Ottenere la lista dei servizi presenti nel sistema",
+                "description": "",
+                "operationId": "listaServizi",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "description": "Indice del primo oggetto da restituire",
+                        "type": "integer",
+                        "required": false
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Numero di oggetti da restituire",
+                        "type": "integer",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/Servizio" }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I valori di start e count non sono coerenti"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/servizio/byID": {
+            "get": {
+                "tags": ["servizio"],
+                "summary": "Ottenere un servizio tramite il suo ID",
+                "description": "",
+                "operationId": "getServizioConID",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID del servizio da restituire",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": { "$ref": "#/definitions/Servizio" }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "404": {
+                        "description": "Not found - Un servizio con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/servizio/disponibilita": {
+            "get": {
+                "tags": ["servizio"],
+                "summary": "Specificando una data di inizio e di fine, viene restituita la disponibilità (true o false) del servizio richiesto nel periodo specificato",
+                "description": "",
+                "operationId": "getDisponibilitaServizio",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID del servizio da restituire",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "inizio",
+                        "in": "query",
+                        "description": "Data di inizio del periodo",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": true
+                    },
+                    {
+                        "name": "fine",
+                        "in": "query",
+                        "description": "Data di fine del periodo",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 200
+                                },
+                                "disponibilita": {
+                                    "type": "boolean",
+                                    "description": "Disponibilità del servizio nel periodo richiesto",
+                                    "example": true
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Il servizio <ID servizio> è diponibile nel periodo tra <Data inizio> e <Data fine>"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti"
+                    },
+                    "404": {
+                        "description": "Not found - Un servizio con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/servizio/{id}": {
+            "patch": {
+                "tags": ["servizio"],
+                "summary": "Modifica di un servizio",
+                "description": "",
+                "operationId": "modificaServizio",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del servizio da modificare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "nome",
+                        "in": "formData",
+                        "description": "Nome del servizio",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "descrizione",
+                        "in": "formData",
+                        "description": "Breve descrizione del servizio",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "tipologia",
+                        "in": "formData",
+                        "description": "Tipo di servizio",
+                        "type": "string",
+                        "enum": [
+                            "Arredamento",
+                            "Attrezzatura specifica",
+                            "Altro"
+                        ],
+                        "required": true
+                    },
+                    {
+                        "name": "prezzoIniziale",
+                        "in": "formData",
+                        "description": "Prezzo del servizio quando viene utilizzato",
+                        "type": "number",
+                        "format": "float",
+                        "required": true
+                    },
+                    {
+                        "name": "prezzoOra",
+                        "in": "formData",
+                        "description": "Prezzo del servizio per ogni ora di utilizzo",
+                        "type": "number",
+                        "format": "float",
+                        "required": true
+                    },
+                    {
+                        "name": "URLfoto",
+                        "in": "formData",
+                        "description": "Percorso della foto del servizio",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Modifica servizio effettuata correttamente",
+                        "schema": { "$ref": "#/definitions/Servizio" }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["servizio"],
+                "summary": "Eliminazione di un servizio",
+                "description": "",
+                "operationId": "eliminaServizio",
+                "consumes": [""],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del servizio da eliminare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Eliminazione del servizio effettuata correttamente",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 200
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Servizio eliminato correttamente"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Un servizio con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -995,7 +1375,7 @@
                 },
                 "descrizione": {
                     "type": "string",
-                    "description": "Breve descrizione del nuovo spazio",
+                    "description": "Breve descrizione dello spazio",
                     "example": "Aula molto grande (100 posti) per spettacoli, conferenze, ..."
                 },
                 "tipologia": {
@@ -1030,6 +1410,55 @@
                     "description": "Lista di ID dei servizi che possono essere utilizzati in questo spazio",
                     "items": { "type": "string" },
                     "required": false
+                }
+            }
+        },
+        "Servizio": {
+            "type": "object",
+            "required": [
+                "_id",
+                "nome",
+                "tipologia",
+                "prezzoIniziale",
+                "prezzoOra"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string",
+                    "description": "Identificativo univoco del servizio"
+                },
+                "nome": {
+                    "type": "string",
+                    "description": "Nome del servizio",
+                    "example": "Proiettore"
+                },
+                "descrizione": {
+                    "type": "string",
+                    "description": "Breve descrizione del servizio",
+                    "example": "Proiettore 720p con interfaccia HDMI e VGA"
+                },
+                "tipologia": {
+                    "type": "string",
+                    "description": "Tipo di servizio",
+                    "enum": ["Arredamento", "Attrezzatura specifica", "Altro"],
+                    "example": "Attrezzatura specifica"
+                },
+                "prezzoIniziale": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Prezzo del servizio quando viene utilizzato",
+                    "example": 2.5
+                },
+                "prezzoOra": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Prezzo del servizio per ogni ora di utilizzo",
+                    "example": 1.0
+                },
+                "URLfoto": {
+                    "type": "string",
+                    "description": "Percorso della foto del servizio",
+                    "example": "images/servizi/default.png"
                 }
             }
         }
