@@ -31,6 +31,10 @@
         {
             "name": "prenotazione",
             "description": "API per le prenotazioni del sistema"
+        },
+        {
+            "name": "ricorrenza",
+            "description": "API per le ricorrenze del sistema"
         }
     ],
     "schemes": ["http"],
@@ -1289,6 +1293,375 @@
                     }
                 }
             }
+        },
+        "/prenotazione": {
+            "post": {
+                "tags": ["prenotazione"],
+                "summary": "Creazione di una nuova prenotazione",
+                "description": "",
+                "operationId": "nuovaPrenotazione",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "proprietario",
+                        "in": "formData",
+                        "description": "ID dell'utente che effettua la prenotazione",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "eventoCollegato",
+                        "in": "formData",
+                        "description": "ID dell'evento collegato alla prenotazione",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "ricorrenze",
+                        "in": "formData",
+                        "description": "Lista di ricorrenze legate a questa prenotazione",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "inizio": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Data e ora di inizio della ricorrenza"
+                                },
+                                "fine": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Data e ora di fine della ricorrenza"
+                                },
+                                "spaziPrenotati": {
+                                    "type": "array",
+                                    "items": { "type": "string" },
+                                    "description": "Lista di ID degli spazi utilizzati in questa ricorrenza",
+                                    "example": ""
+                                },
+                                "serviziPrenotati": {
+                                    "type": "array",
+                                    "items": { "type": "string" },
+                                    "description": "Lista di ID dei servizi utilizzati in questa ricorrenza",
+                                    "example": ""
+                                }
+                            }
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created - Prenotazione effettuata correttamente",
+                        "schema": { "$ref": "#/definitions/Prenotazione" }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/prenotazione/byUtente": {
+            "get": {
+                "tags": ["prenotazione"],
+                "summary": "Ottenere la lista delle prenotazioni di un dato utente",
+                "description": "",
+                "operationId": "listaPrenotazioniPerUtente",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": { "$ref": "#/definitions/Prenotazione" }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/prenotazione/byID": {
+            "get": {
+                "tags": ["prenotazione"],
+                "summary": "Ottenere una prenotazione tramite il suo ID",
+                "description": "",
+                "operationId": "getPrenotazioneConID",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID della prenotazione da restituire",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": { "$ref": "#/definitions/Prenotazione" }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Una prenotazione con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/prenotazione/ricorrenze": {
+            "get": {
+                "tags": ["prenotazione"],
+                "summary": "Ottenere la lista delle ricorrenze legate a una prenotazione",
+                "description": "",
+                "operationId": "getRicorrenzePrenotazione",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID della prenotazione",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/Ricorrenza" }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Una prenotazione con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/prenotazione/{id}": {
+            "patch": {
+                "tags": ["prenotazione"],
+                "summary": "Modifica di una prenotazione",
+                "description": "",
+                "operationId": "modificaPrenotazione",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID della prenotazione da modificare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "proprietario",
+                        "in": "formData",
+                        "description": "ID dell'utente che effettua la prenotazione",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "statusPagamento",
+                        "in": "formData",
+                        "description": "Stato del pagamento: 0 -> da pagare, 1 -> pagato online, 2 -> pagato in contanti",
+                        "type": "integer",
+                        "required": true
+                    },
+                    {
+                        "name": "importoPagamento",
+                        "in": "formData",
+                        "description": "Totale da pagare",
+                        "type": "number",
+                        "format": "float",
+                        "required": false
+                    },
+                    {
+                        "name": "eventoCollegato",
+                        "in": "formData",
+                        "description": "ID dell'evento collegato alla prenotazione",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "ricorrenze",
+                        "in": "formData",
+                        "description": "Lista di ricorrenze legate a questa prenotazione",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "inizio": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Data e ora di inizio della ricorrenza"
+                                },
+                                "fine": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Data e ora di fine della ricorrenza"
+                                },
+                                "spaziPrenotati": {
+                                    "type": "array",
+                                    "items": { "type": "string" },
+                                    "description": "Lista di ID degli spazi utilizzati in questa ricorrenza",
+                                    "example": ""
+                                },
+                                "serviziPrenotati": {
+                                    "type": "array",
+                                    "items": { "type": "string" },
+                                    "description": "Lista di ID dei servizi utilizzati in questa ricorrenza",
+                                    "example": ""
+                                }
+                            }
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Prenotazione modificata correttamente",
+                        "schema": { "$ref": "#/definitions/Prenotazione" }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Una prenotazione con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["prenotazione"],
+                "summary": "Eliminazione di una prenotazione e delle sue ricorrenze",
+                "description": "",
+                "operationId": "eliminaPrenotazione",
+                "consumes": [""],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID della prenotazione da eliminare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Eliminazione della prenotazione effettuata correttamente",
+                        "schema": { "$ref": "#/definitions/Prenotazione" }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Una prenotazione con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1459,6 +1832,80 @@
                     "type": "string",
                     "description": "Percorso della foto del servizio",
                     "example": "images/servizi/default.png"
+                }
+            }
+        },
+        "Prenotazione": {
+            "type": "object",
+            "required": [
+                "_id",
+                "proprietario",
+                "statusPagamento",
+                "importoPagamento",
+                "ricorrenze"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string",
+                    "description": "Identificativo univoco della prenotazione"
+                },
+                "proprietario": {
+                    "type": "string",
+                    "description": "ID dell'utente che effettua la prenotazione"
+                },
+                "statusPagamento": {
+                    "type": "integer",
+                    "description": "Stato del pagamento: 0 -> da pagare, 1 -> pagato online, 2 -> pagato in contanti",
+                    "example": 1
+                },
+                "importoPagamento": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Totale da pagare",
+                    "example": 30.75
+                },
+                "eventoCollegato": {
+                    "type": "string",
+                    "description": "ID dell'evento collegato alla prenotazione"
+                },
+                "ricorrenze": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/Ricorrenza" },
+                    "description": "Lista di ricorrenze legate a questa prenotazione"
+                }
+            }
+        },
+        "Ricorrenza": {
+            "type": "object",
+            "required": ["_id", "inizio", "fine", "spaziPrenotati"],
+            "properties": {
+                "_id": {
+                    "type": "string",
+                    "description": "Identificativo univoco della ricorrenza"
+                },
+                "inizio": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Data e ora di inizio della ricorrenza",
+                    "example": "2023-01-10T16:30:00.000Z"
+                },
+                "fine": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Data e ora di fine della ricorrenza",
+                    "example": "2023-01-10T18:30:00.000Z"
+                },
+                "spaziPrenotati": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/Spazio" },
+                    "description": "Lista degli spazi utilizzati in questa ricorrenza",
+                    "example": ""
+                },
+                "serviziPrenotati": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/Servizio" },
+                    "description": "Lista dei servizi utilizzati in questa ricorrenza",
+                    "example": ""
                 }
             }
         }

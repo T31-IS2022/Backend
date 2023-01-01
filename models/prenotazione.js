@@ -11,15 +11,19 @@ const positiveNumber = {
 };
 
 const schemaPrenotazione = new mongoose.Schema({
-    proprietario: {type: mongoose.Schema.Types.ObjectId, ref: 'Utente' },
-    statusPagamento: Number,
+    proprietario: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
+    statusPagamento: Number, //0 -> da pagare, 1 -> pagato online, 2 -> Pagato in contanti
     importoPagamento: positiveNumber,
-    ricorrenze: [{type: mongoose.Schema.Types.ObjectId, ref: 'Ricorrenza' }],
-    eventoCollegato: {type: mongoose.Schema.Types.ObjectId, ref: 'Evento' },
+    ricorrenze: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ricorrenza" }],
+    eventoCollegato: { type: mongoose.Schema.Types.ObjectId, ref: "Evento" },
 });
 
 //converto lo schema in un modello
-const Prenotazione = mongoose.model("Prenotazione", schemaPrenotazione, "prenotazioni");
+const Prenotazione = mongoose.model(
+    "Prenotazione",
+    schemaPrenotazione,
+    "prenotazioni"
+);
 
 //esporto il modello per poterlo usare nei controller
 module.exports = Prenotazione;
