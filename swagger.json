@@ -466,7 +466,7 @@
                 "summary": "Eliminazione di un utente",
                 "description": "",
                 "operationId": "eliminaUtente",
-                "consumes": [""],
+                "consumes": [],
                 "produces": ["application/json"],
                 "parameters": [
                     {
@@ -859,7 +859,7 @@
                 "summary": "Eliminazione di uno spazio",
                 "description": "",
                 "operationId": "eliminaSpazio",
-                "consumes": [""],
+                "consumes": [],
                 "produces": ["application/json"],
                 "parameters": [
                     {
@@ -1239,7 +1239,7 @@
                 "summary": "Eliminazione di un servizio",
                 "description": "",
                 "operationId": "eliminaServizio",
-                "consumes": [""],
+                "consumes": [],
                 "produces": ["application/json"],
                 "parameters": [
                     {
@@ -1625,7 +1625,7 @@
                 "summary": "Eliminazione di una prenotazione e delle sue ricorrenze",
                 "description": "",
                 "operationId": "eliminaPrenotazione",
-                "consumes": [""],
+                "consumes": [],
                 "produces": ["application/json"],
                 "parameters": [
                     {
@@ -1656,6 +1656,227 @@
                     },
                     "404": {
                         "description": "Not found - Una prenotazione con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/ricorrenza/byID": {
+            "get": {
+                "tags": ["ricorrenza"],
+                "summary": "Ottenere una ricorrenza tramite il suo ID",
+                "description": "",
+                "operationId": "getRicorrenzaConID",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID della ricorrenza da restituire",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": { "$ref": "#/definitions/Ricorrenza" }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Una ricorrenza con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/ricorrenza/byPeriodo": {
+            "get": {
+                "tags": ["ricorrenza"],
+                "summary": "Specificando una data di inizio e di fine, viene restituita la lista di ricorrenze comprese nel periodo specificato",
+                "description": "",
+                "operationId": "getRicorrenzePerPeriodo",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "inizio",
+                        "in": "query",
+                        "description": "Data di inizio del periodo",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": true
+                    },
+                    {
+                        "name": "fine",
+                        "in": "query",
+                        "description": "Data di fine del periodo",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/Ricorrenza" }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            }
+        },
+        "/ricorrenza/{id}": {
+            "patch": {
+                "tags": ["ricorrenza"],
+                "summary": "Modifica di una ricorrenza",
+                "description": "",
+                "operationId": "modificaRicorrenza",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID della ricorrenza da modificare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "inizio",
+                        "in": "formData",
+                        "description": "Data e ora di inizio della ricorrenza",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": true
+                    },
+                    {
+                        "name": "fine",
+                        "in": "formData",
+                        "description": "Data e ora di fine della ricorrenza",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": true
+                    },
+                    {
+                        "name": "spaziPrenotati",
+                        "in": "formData",
+                        "description": "Lista di ID degli spazi utilizzati in questa ricorrenza",
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "required": true
+                    },
+                    {
+                        "name": "serviziPrenotati",
+                        "in": "formData",
+                        "description": "Lista di ID dei servizi utilizzati in questa ricorrenza",
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Ricorrenza modificata correttamente",
+                        "schema": { "$ref": "#/definitions/Ricorrenza" }
+                    },
+                    "400": {
+                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Una ricorrenza con l'ID fornito non esiste"
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["ricorrenza"],
+                "summary": "Eliminazione di una ricorrenza",
+                "description": "",
+                "operationId": "eliminaRicorrenza",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID della ricorrenza da eliminare",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "Token di accesso dell'utente",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Eliminazione della ricorrenza effettuata correttamente",
+                        "schema": { "$ref": "#/definitions/Ricorrenza" }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                    },
+                    "404": {
+                        "description": "Not found - Una ricorrenza con l'ID fornito non esiste"
                     },
                     "500": {
                         "description": "Internal server error - Errore imprevisto durante l'operazione"
@@ -1898,14 +2119,12 @@
                 "spaziPrenotati": {
                     "type": "array",
                     "items": { "$ref": "#/definitions/Spazio" },
-                    "description": "Lista degli spazi utilizzati in questa ricorrenza",
-                    "example": ""
+                    "description": "Lista degli spazi utilizzati in questa ricorrenza"
                 },
                 "serviziPrenotati": {
                     "type": "array",
                     "items": { "$ref": "#/definitions/Servizio" },
-                    "description": "Lista dei servizi utilizzati in questa ricorrenza",
-                    "example": ""
+                    "description": "Lista dei servizi utilizzati in questa ricorrenza"
                 }
             }
         }

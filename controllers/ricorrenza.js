@@ -1,4 +1,4 @@
-const Ricorrenza = require("../models/ricorrenza")
+const Ricorrenza = require("../models/ricorrenza");
 
 var ObjectID = require("mongodb").ObjectId;
 
@@ -6,33 +6,33 @@ var ObjectID = require("mongodb").ObjectId;
 const getRicorrenzaConID = (req, res) => {
     console.log(
         "Richiesta ricorrenza con ID\n\tQuery: " +
-        JSON.stringify(req.query) +
-        "\n\tParametri: " +
-        JSON.stringify(req.params)
+            JSON.stringify(req.query) +
+            "\n\tParametri: " +
+            JSON.stringify(req.params)
     );
 
     // parametro nell'url ?id= . . .
     let id = req.query.id;
 
-    if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({code:403, message: "Utente non autorizzato"});
+    if (req.utente.livello < 2 && req.utente._id != id)
+        return res
+            .status(403)
+            .json({ code: 403, message: "Utente non autorizzato" });
 
-    Ricorrenza
-    .findOne({ _id: ObjectID(id)})
-    .populate('spaziPrenotati')
-    .populate('serviziPrenotati')
-    .exec((err, data) => {
-        if (err)
-            return res.status(500).json({code:500, message: err});
-        if(!data)
-            return res.status(404).json({
-                code:404,
-                message: "La ricorrenza non esiste",
-            });
-    
-        return res.status(200).json(data);
-    });
-}
+    Ricorrenza.findOne({ _id: ObjectID(id) })
+        .populate("spaziPrenotati")
+        .populate("serviziPrenotati")
+        .exec((err, data) => {
+            if (err) return res.status(500).json({ code: 500, message: err });
+            if (!data)
+                return res.status(404).json({
+                    code: 404,
+                    message: "La ricorrenza non esiste",
+                });
+
+            return res.status(200).json(data);
+        });
+};
 
 // elimina ricorrenza
 const eliminaRicorrenza = (req, res) => {
@@ -43,21 +43,22 @@ const eliminaRicorrenza = (req, res) => {
     // htpps://...route.../:id
     let id = req.params.id;
 
-    if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({code:403, message: "Utente non autorizzato"});
+    if (req.utente.livello < 2 && req.utente._id != id)
+        return res
+            .status(403)
+            .json({ code: 403, message: "Utente non autorizzato" });
 
-    Ricorrenza.findOneAndDelete({_id: ObjectID(id)}, (err, data) => {
-        if(err){
+    Ricorrenza.findOneAndDelete({ _id: ObjectID(id) }, (err, data) => {
+        if (err) {
             return res.status(404).json({
-                code:400,
+                code: 400,
                 message: "La ricorrenza non esiste",
             });
-        }
-        else{
+        } else {
             return res.status(200).json(data);
         }
     });
-}
+};
 
 // modifica ricorrenza
 const modificaRicorrenza = (req, res) => {
@@ -67,16 +68,18 @@ const modificaRicorrenza = (req, res) => {
 
     let id = req.params.id;
 
-    if (req.utente.livello<2 && req.utente._id != id)
-        return res.status(403).json({code: 403, message: "Utente non autorizzato"});
+    if (req.utente.livello < 2 && req.utente._id != id)
+        return res
+            .status(403)
+            .json({ code: 403, message: "Utente non autorizzato" });
 
-    Ricorrenza.findOne({ _id: ObjectID(id) }, (err, data) =>{
-        if (err)
-            return res.status(500).json({code:500, message: err});
-        if(!data){
-            return res.status(404).json({code:404, message: "La ricorrenza non esiste"});
-        }
-        else{
+    Ricorrenza.findOne({ _id: ObjectID(id) }, (err, data) => {
+        if (err) return res.status(500).json({ code: 500, message: err });
+        if (!data) {
+            return res
+                .status(404)
+                .json({ code: 404, message: "La ricorrenza non esiste" });
+        } else {
             /*
                 Esempio formato del body (date ottenute con new Date().toISOString() )
                 - formato raw json
@@ -94,56 +97,51 @@ const modificaRicorrenza = (req, res) => {
             data.serviziPrenotati = req.body.serviziPrenotati;
 
             data.save((err, data) => {
-                if (err){
-                    return res.status(500).json({code:500,message: err })
-                }
-                else return res.status(200).json(data);
-                
+                if (err) {
+                    return res.status(500).json({ code: 500, message: err });
+                } else return res.status(200).json(data);
             });
         }
     });
-}
+};
 
 // ottieni ricorrenze in un intervallo di tempo
 const getRicorrenzePerPeriodo = (req, res) => {
     console.log(
         "Richieste ricorrenze in intervallo di tempo\n\tQuery: " +
-        JSON.stringify(req.query) +
-        "\n\tParametri: " +
-        JSON.stringify(req.params)
+            JSON.stringify(req.query) +
+            "\n\tParametri: " +
+            JSON.stringify(req.params)
     );
 
-    if(req.query.inizio > req.query.fine){
+    if (req.query.inizio > req.query.fine) {
         return res.status(400).json({
-            code:400,
-            errore: "data di inizio maggiore di data di fine"
+            code: 400,
+            errore: "data di inizio maggiore di data di fine",
         });
     }
-    
+
     // cerco tutte le ricorrenze che sono "sovrapposte" anche parzialmente
-    // all'intervallo di tempo specificato in req.query (ad esempio se viene passato l'intervallo 
+    // all'intervallo di tempo specificato in req.query (ad esempio se viene passato l'intervallo
     // da 12:00 a 16:00, viene ritornata anche la ricorrenza che va da 11:00 a 13:00 perchè è nell'intervallo specificato)
     let query = {
         inizio: { $lt: req.query.fine },
-        fine: { $gte: req.query.inizio }
-    }
+        fine: { $gte: req.query.inizio },
+    };
 
     Ricorrenza.find(query)
-                .populate('spaziPrenotati')
-                .populate('serviziPrenotati')
-                .exec((err, data) => {
-                    if(err){
-                        return res.status(500).json({code:500, errore: err})
-                    }
-                    else return res.status(200).json(data);
-                });
-
-    
-}
+        .populate("spaziPrenotati")
+        .populate("serviziPrenotati")
+        .exec((err, data) => {
+            if (err) {
+                return res.status(500).json({ code: 500, errore: err });
+            } else return res.status(200).json(data);
+        });
+};
 
 module.exports = {
     getRicorrenzePerPeriodo,
     modificaRicorrenza,
     eliminaRicorrenza,
-    getRicorrenzaConID
-}
+    getRicorrenzaConID,
+};
