@@ -1,11 +1,18 @@
 require("dotenv").config();
-
+const bp = require('body-parser');
+const cp = require('cookie-parser');
+const cors = require('cors');
 // aggiunge le routes all'applicazione
 
 const express = require("express")
 const app = express();
 
 console.log("started application");
+
+app.use(bp.json());
+app.use(bp.urlencoded({extended:true}));
+app.use(cp());
+app.use(cors());
 
 //aggiungere routes
 const routesServizio = require("./routes/servizio");
@@ -22,6 +29,8 @@ app.use("/spazio", routesSpazio);
 
 const routesUtente = require("./routes/utente");
 app.use("/utente", routesUtente);
+
+app.use(express.static("../pages"));
 
 //metto express in ascolto sulla porta specificata nel file .env
 const PORT = process.env.PORT || 3000;

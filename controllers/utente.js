@@ -1,6 +1,7 @@
 //includo il modello dello spazio per poterlo usare qui
 const Utente = require("../models/utente");
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const {servizioMail: servizioMail} = require('../scripts/email');
 //includo l'ObjectId per poter cercare elementi tramite il loro ID
 var ObjectId = require("mongodb").ObjectId;
@@ -10,6 +11,15 @@ function generaToken(data){
         {data}, 
         process.env.JWT_KEY,
         {expiresIn: 86400});
+}
+
+function hashPassword(password, salt){
+    return crypto.createHmac(
+        'sha256',
+        salt        
+    )
+    .update(password)
+    .digest('hex');
 }
 
 //FUNZIONI PER LE VARIE ROUTES
@@ -51,28 +61,34 @@ const loginUtente = (req, res) => {
             JSON.stringify(req.body)
     );
 
+    if (!req.body)
+        return res.status(400).json({code: 404, messsage: "Body mancante"});
+
     //prendo l'email dell'utente dai parametri della richiesta
     let email = req.body.email;
     //prendo la password dell'utente dai parametri della richiesta
     let password = req.body.password;
 
     //se non trovo email e password nella richiesta rispondo con bad request
-    if (email == undefined || password == undefined) {
+    if (!email || !password) {
         return res
             .status(400)
             .json({ message: "Specificare email e password" });
     }
 
-    //TODO implementare controllo di sicurezza
-
     //cerco e restituisco l'utente con quella email e quella password
-    Utente.findOne({ email: email, password: password, confermaAccount: true }, (err, data) => {
-        if (err || !data) {
-            return res.status(401).json({ message: "Email o password errati" });
-        } else {
-            token = generaToken(data);
-            return res.status(200).json({token: token}); 
-        }
+    Utente.findOne({ email: email }, (err, data) => {
+        if (err)
+            return res.status(500).json({code: 500, message: err});
+        if (!data)
+            return res.status(404).json({code: 404, message: "Email errata" });
+        if (data.password != hashPassword(password, data.salt))
+            return res.status(404).json({code:400, message: "Password invalida"});
+        if (!data.confermaAccount)
+            return res.status(400).json({code: 400, message: "L'utente non ha confermato l'account" });
+        
+        token = generaToken(data);
+        return res.status(200).json({token: token}); 
     });
 };
 
@@ -115,7 +131,7 @@ const registrazione = (req, res) => {
 
     const body = req.body;
     if (!body || !(body.email && body.nome && body.cognome && body.password)){
-        return res.status(400).json({message: "Parametri mancanti"});
+        return res.status(400).json({code: 400, message: "Parametri mancanti"});
     }
 
     const nome = body.nome;
@@ -128,55 +144,50 @@ const registrazione = (req, res) => {
 
     //controllo se un utente con questa email è già stato inserito nel database
     Utente.findOne({ email: email }, (err, data) => {
-        if (!data) {
-            //se non l'ho inserito creo un nuovo utente con i dati provenienti dalla richiesta
-            const nuovoUtente = new Utente({
-                nome: nome,
-                cognome: cognome,
-                email: email,
-                password: password,
-                telefono: telefono,
-                indirizzo: indirizzo,
-                URLfoto: foto,
-            });
+        if (err) 
+            return res.status(500).json({code: 500, message:err});
+        if (data)
+            return res.status(409).json({code: 409, message: "E' già presente un utente con questa e-mail"});
 
-            console.log(nuovoUtente);
+        //se non l'ho inserito creo un nuovo utente con i dati provenienti dalla richiesta
+        const salt = crypto.randomBytes(16).toString('hex');
+        const hashedPsw = hashPassword(password, salt);
 
-            //salvo il nuovo utente nel database
-            nuovoUtente.save((err, data) => {
-                if (err) {
-                    return res.status(500).json({ Errore: err }); //risposta in caso di errore
-                } else {
-                    const id = data._id;
-                    servizioMail.sendMail({
-                        from: `t31 <noreply.${process.env.EMAIL_ADDR}>`,
-                        replyTo: `noreply.${process.env.EMAIL_ADDR}`,
-                        to: email,
-                        subject: "Conferma account Makako",
-                        text: "Conferma il tuo account Makako per poter utilizzare il tuo account",
-                        html: `<h1>Conferma il tuo account Makako</h1><p>Attiva ora l'account ${nome} ${cognome}</p><br/><a href="${process.env.WEB_ADDR}/utente/conferma?id=${id}">Conferma!</a>`
-                    }).then(info=>{
-                        console.log(info);
-                    }).catch(err=>{
-                        console.log(err);
-                    });
-                    return res.status(201).json(data); //risposta se l'utente è stato salvato nel database
-                }
+        const nuovoUtente = new Utente({
+            nome: nome,
+            cognome: cognome,
+            email: email,
+            password: hashedPsw,
+            telefono: telefono,
+            indirizzo: indirizzo,
+            URLfoto: foto,
+            salt: salt
+        });
+
+        console.log(nuovoUtente);
+
+        //salvo il nuovo utente nel database
+        nuovoUtente.save((err, data) => {
+            if (err) 
+                return res.status(500).json({code: 500, message: err }); //risposta in caso di errore
+            
+            const id = data._id;
+            servizioMail.sendMail({
+                from: `t31 <noreply.${process.env.EMAIL_ADDR}>`,
+                replyTo: `noreply.${process.env.EMAIL_ADDR}`,
+                to: email,
+                subject: "Conferma account Makako",
+                text: "Conferma il tuo account Makako per poter utilizzare il tuo account",
+                html: `<h1>Conferma il tuo account Makako</h1><p>Attiva ora l'account ${nome} ${cognome}</p><br/><a href="${process.env.WEB_ADDR}/utente/conferma?id=${id}">Conferma!</a>`
+            }).then(info=>{
+                console.log(info);
+            }).catch(err=>{
+                console.log(err);
             });
-        } else {
-            //se non è stato inserito controllo se c'è un errore
-            if (err) {
-                return res.status(500).json("Errore nella registrazione. Errore: " + err);
-            } else {
-                //altrimenti rispondo dicendo che l'utente è già stato inserito
-                return res.status(409).json({
-                    message: "E' già presente un utente con questa e-mail",
-                });
-            }
-        }
+            return res.status(201).json(data); //risposta se l'utente è stato salvato nel database
+        });
     });
 };
-
 //restituisce le info di uno utente data l'email
 const getUtenteConEmail = (req, res) => {
     console.log(
@@ -280,10 +291,11 @@ const modificaUtente = (req, res) => {
             data.nome = nome;
             data.cognome = cognome;
             data.email = email;
-            data.password = password;
+            data.password = hashPassword(password,data.salt);
             data.telefono = telefono;
             data.indirizzo = indirizzo;
             data.URLfoto = foto;
+            data.salt = data.salt;
 
             //salvo le modifiche
             data.save((err, data) => {
