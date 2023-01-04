@@ -1,6 +1,12 @@
 require("dotenv").config();
 
 const express = require("express");
+const bp = require('body-parser');
+const cp = require('cookie-parser');
+const cors = require('cors');
+// aggiunge le routes all'applicazione
+
+const express = require("express")
 const app = express();
 
 const swaggerUi = require("swagger-ui-express");
@@ -9,6 +15,12 @@ const swaggerDocument = require("./swagger.json");
 console.log("Application started");
 
 //routes
+app.use(bp.json());
+app.use(bp.urlencoded({extended:true}));
+app.use(cp());
+app.use(cors());
+
+//aggiungere routes
 const routesServizio = require("./routes/servizio");
 app.use("/servizio", routesServizio);
 

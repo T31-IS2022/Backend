@@ -14,6 +14,7 @@ const schemaUtente = new mongoose.Schema({
     cognome: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
+    salt: {type:String, required: true},
     confermaAccount: { type: Boolean, default: false },
     metodoPagamento: {schemaMetodoPagamento},
     telefono: String,
