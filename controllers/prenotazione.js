@@ -156,7 +156,7 @@ const nuovaPrenotazione = async (req, res) => {
     console.log("Nuova prenotazione\n\tParametri: " + JSON.stringify(req.body));
 
     // array di nuove ricorrenze da inserire nel db
-    let nuoveRicorrenze = JSON.parse(req.body.ricorrenze);
+    let nuoveRicorrenze = req.body.ricorrenze;
     console.log("nuove ricorrenze: " + nuoveRicorrenze);
 
     // inserisce le ricorrenze nel db e salva gli ObjectId
@@ -164,9 +164,14 @@ const nuovaPrenotazione = async (req, res) => {
     for (let i = 0; i < nuoveRicorrenze.length; i++) {
         const ricorrenza = nuoveRicorrenze[i];
 
+        console.log(ricorrenza.inizio);
+
+        dataInizio = new Date(ricorrenza.inizio).toISOString();
+        dataFine = new Date(ricorrenza.fine).toISOString();
+
         const nuovaRicorrenza = new Ricorrenza({
-            inizio: ricorrenza.inizio,
-            fine: ricorrenza.fine,
+            inizio: dataInizio,
+            fine: dataFine,
             spaziPrenotati: ricorrenza.spaziPrenotati,
             serviziPrenotati: ricorrenza.serviziPrenotati,
         });

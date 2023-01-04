@@ -1298,7 +1298,7 @@
             "post": {
                 "tags": ["prenotazione"],
                 "summary": "Creazione di una nuova prenotazione",
-                "description": "",
+                "description": "NON utilizzabile per test a causa di un bug di SwaggerUI",
                 "operationId": "nuovaPrenotazione",
                 "consumes": ["multipart/form-data"],
                 "produces": ["application/json"],
@@ -1345,14 +1345,12 @@
                                 "spaziPrenotati": {
                                     "type": "array",
                                     "items": { "type": "string" },
-                                    "description": "Lista di ID degli spazi utilizzati in questa ricorrenza",
-                                    "example": ""
+                                    "description": "Lista di ID degli spazi utilizzati in questa ricorrenza"
                                 },
                                 "serviziPrenotati": {
                                     "type": "array",
                                     "items": { "type": "string" },
-                                    "description": "Lista di ID dei servizi utilizzati in questa ricorrenza",
-                                    "example": ""
+                                    "description": "Lista di ID dei servizi utilizzati in questa ricorrenza"
                                 }
                             }
                         },
