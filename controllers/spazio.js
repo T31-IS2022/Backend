@@ -19,13 +19,15 @@ const listaSpazi = (req, res) => {
 
     //cerco gli spazi dando un filtro vuoto per ottenerli tutti
     Spazio.find({}, (err, data) => {
-        if (err) {
+        if (err) 
             return res.status(500).json({ code: 500, message: err }); //risposta in caso di errore
-        }
+        if (!data)
+            return res.status(204).json({code:204, message:"Nessuno spazio trovato"}); 
         return res.status(200).json(data); //restituisco i dati di tutti gli spazi
     })
-        .skip(start)
-        .limit(count);
+    .skip(start)
+    .limit(count)
+    .populate('servizi');
 };
 
 //restituisce le info di uno spazio dato l'ID
@@ -48,7 +50,8 @@ const getSpazioConID = (req, res) => {
                 message: "Lo spazio richiesto non esiste",
             });
         } else return res.status(200).json(data); //se trovo l'oggetto lo restituisco
-    });
+    })
+    .populate('servizi');
 };
 
 //restituisce lo status dello spazio nel periodo indicato
@@ -196,7 +199,7 @@ const cancellaSpazio = (req, res) => {
                 .json({ code: 404, message: "Lo spazio richiesto non esiste" });
         } else {
             //cerco ed elimino lo spazio con quell'ID
-            Spazio.deleteOne({ _id: ObjectId(id) }, (err) => {
+            Spazio.findOneAndDelete({ _id: ObjectId(id) }, (err) => {
                 if (err)
                     return res.status(500).json({ code: 500, message: err });
 

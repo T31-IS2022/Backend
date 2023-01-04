@@ -47,7 +47,9 @@ const listaUtenti = (req, res) => {
         if (err) {
             return res.status(500).json({ code: 500, message: err }); //risposta in caso di errore
         }
-        return res.status(data ? 200 : 204).json(data); //restituisco i dati di tutti gli spazi
+        if (!data)
+            return res.status(204).json({code: 204, message:"Nessun utente trovato"});
+        return res.status(200).json(data); //restituisco i dati di tutti gli spazi
     })
         .skip(start)
         .limit(count);
@@ -357,7 +359,7 @@ const cancellaUtente = (req, res) => {
                 .json({ code: 404, message: "L'utente richiesto non esiste" });
 
         //cerco ed elimino l'utente con quell'ID
-        Utente.deleteOne({ _id: ObjectId(id) }, (err) => {
+        Utente.findOneAndDelete({ _id: ObjectId(id) }, (err) => {
             if (err) return res.status(500).json({ code: 500, message: err });
             return res.status(200).json({
                 code: 200,

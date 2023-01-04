@@ -27,6 +27,8 @@ const listaServizi = (req, res) => {
         .skip(start)
         .limit(count)
         .then((data) => {
+            if (!data)
+                return res.status(204).json({code:204, message:"Nessun servizio trovato"});
             return res.status(200).json(data);
         })
         .catch((err) => {
@@ -155,38 +157,25 @@ const crea = (req, res) => {
         });
     }
 
-    Servizio.count({ nome: nome })
-        .then((numero) => {
-            if (numero == 0) {
-                const nuovoServizio = new Servizio({
-                    nome: nome,
-                    descrizione: descrizione,
-                    tipologia: tipologia,
-                    prezzoIniziale: prezzoIniziale,
-                    prezzoOra: prezzoOra,
-                    URLfoto: foto,
-                });
-                console.log(`Nuovo servizio: \n${nuovoServizio}`);
-                nuovoServizio
-                    .save()
-                    .then((data) => {
-                        return res.status(201).json({ data });
-                    })
-                    .catch((err) => {
-                        return res
-                            .status(500)
-                            .json({ code: 500, message: err });
-                    });
-            } else {
-                res.status(409).json({
-                    code: 409,
-                    messaage: `Esiste già un servizio con nome ${nome}`,
-                });
-            }
-        })
-        .catch((err) => {
-            return res.status(500).json({ Errore: err });
-        });
+    const nuovoServizio = new Servizio({
+        nome: nome,
+        descrizione: descrizione,
+        tipologia: tipologia,
+        prezzoIniziale: prezzoIniziale,
+        prezzoOra: prezzoOra,
+        URLfoto: foto,
+    });
+    console.log(`Nuovo servizio: \n${nuovoServizio}`);
+    nuovoServizio
+    .save()
+    .then((data) => {
+        return res.status(201).json({ data });
+    })
+    .catch((err) => {
+        return res
+            .status(500)
+            .json({ code: 500, message: err });
+    });
 };
 
 const modifica = (req, res) => {
@@ -269,7 +258,7 @@ const cancella = (req, res) => {
         return res.status(400).json({ message: "id non specificato" });
     }
 
-    const cancellato = Servizio.deleteOne({ _id: ObjectId(id) })
+    const cancellato = Servizio.findOneAndDelete({ _id: ObjectId(id) })
         .then(() => {
             res.status(200).json({
                 code: 200,

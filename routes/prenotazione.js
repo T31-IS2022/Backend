@@ -13,5 +13,6 @@ router.delete("/:id", tokenChecker(1), controllerPrenotazione.eliminaPrenotazion
 router.get("/ricorrenze", tokenChecker(1), controllerPrenotazione.getRicorrenzePrenotazione);
 router.patch("/:id", tokenChecker(1), controllerPrenotazione.modificaPrenotazione);
 router.get("/byUtente", tokenChecker(1), controllerPrenotazione.getPrenotazioniUtente);
+router.get("/", tokenChecker(2), controllerPrenotazione.tutti);
 
 module.exports = router;

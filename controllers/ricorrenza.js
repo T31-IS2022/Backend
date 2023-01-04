@@ -139,9 +139,41 @@ const getRicorrenzePerPeriodo = (req, res) => {
         });
 };
 
+const tutti = (req,res)=>{
+    console.log("Richiesta lista ricorrenze");
+
+    const count = parseInt(req.query.count || 50);
+    const start = parseInt(req.query.start || 0);
+
+    if (isNaN(count) || isNaN(start)) {
+        return res
+            .status(400)
+            .json({ code: 400, message: "start e count devono essere interi" });
+    }
+    if (count < 1 || start < 0) {
+        return res.status(400).json({
+            code: 400,
+            message: "start deve essere positivo e count maggiore di 0",
+        });
+    }
+
+    Ricorrenza.find({})
+        .skip(start)
+        .limit(count)
+        .then((data) => {
+            if (!data)
+                return res.status(204).json({code:204, message:"Nessua ricorrenza trovata"});
+            return res.status(200).json(data);
+        })
+        .catch((err) => {
+            return res.status(500).json({ code: 500, message: err });
+        });
+}
+
 module.exports = {
     getRicorrenzePerPeriodo,
     modificaRicorrenza,
     eliminaRicorrenza,
     getRicorrenzaConID,
+    tutti
 };
