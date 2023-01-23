@@ -1,8 +1,8 @@
 //includo il modello dello spazio per poterlo usare qui
 const Utente = require("../models/utente");
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const {servizioMail: servizioMail} = require('../scripts/email');
+const crypto = require('node:crypto');
+const servizioMail = require('../scripts/email');
 //includo l'ObjectId per poter cercare elementi tramite il loro ID
 var ObjectId = require("mongodb").ObjectId;
 

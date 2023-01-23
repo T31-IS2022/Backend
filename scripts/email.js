@@ -9,4 +9,4 @@ const servizioMail=nodemailer.createTransport({
     }
 });
 
-module.exports={servizioMail};
+module.exports=servizioMail;

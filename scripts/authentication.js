@@ -15,7 +15,7 @@ NB: teoricamente questa funzione non dovrebbe mai essere chiamata con livello 0
 
 const tokenChecker = (livello)=>{
     return (req, res, next)=>{
-        const token = req.headers['token'] || req.cookies['token'];
+        const token = req.headers['x-access-token'] || req.cookies['x-access-token'];
         if (!token)
             return res.status(401).json({message: "Token mancante"});   
         jwt.verify(token, process.env.JWT_KEY, (err, decripted)=>{
@@ -37,4 +37,4 @@ const tokenChecker = (livello)=>{
     }
 }
 
-module.exports={tokenChecker};
+module.exports=tokenChecker;

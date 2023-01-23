@@ -35,6 +35,8 @@ app.use("/utente", routesUtente);
 //route per la documentazione fornita da Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+//app.use(express.static('../pages'))
+
 //metto express in ascolto sulla porta specificata nel file .env
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("App in ascolto sulla porta " + PORT));

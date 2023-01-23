@@ -1,5 +1,5 @@
 const express = require("express"); //includo express
-const {tokenChecker: tokenChecker} = require("../scripts/authentication");
+const tokenChecker = require("../scripts/authentication");
 
 //includo multer per poter leggere i dati dello spazio dal form
 const multer = require("multer");

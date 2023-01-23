@@ -1,5 +1,5 @@
 const express = require("express")
-const {tokenChecker: tokenChecker} = require("../scripts/authentication");
+const tokenChecker = require("../scripts/authentication");
 
 const router = express.Router();
 
