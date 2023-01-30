@@ -1,9 +1,9 @@
 require("dotenv").config();
 
 const express = require("express");
-const bp = require('body-parser');
-const cp = require('cookie-parser');
-const cors = require('cors');
+const bp = require("body-parser");
+const cp = require("cookie-parser");
+const cors = require("cors");
 
 const app = express();
 
@@ -13,9 +13,11 @@ const swaggerDocument = require("./swagger.json");
 console.log("Application started");
 
 app.use(bp.json());
-app.use(bp.urlencoded({extended:true}));
+app.use(bp.urlencoded({ extended: true }));
 app.use(cp());
 app.use(cors());
+
+app.use("/images", express.static("images"));
 
 const routesServizio = require("./routes/servizio");
 app.use("/servizio", routesServizio);
@@ -51,11 +53,7 @@ mongoose.connect(
     process.env.MONGODB_URI,
     { useNewUrlParser: true, useUnifiedTopology: true },
     (err) => {
-        if (err)
-            return console.log("Errore nel collegamento al database: ", err);
-        console.log(
-            "Connessione a MongoDB -- Stato connessione:",
-            mongoose.connection.readyState
-        );
+        if (err) return console.log("Errore nel collegamento al database: ", err);
+        console.log("Connessione a MongoDB -- Stato connessione:", mongoose.connection.readyState);
     }
 );

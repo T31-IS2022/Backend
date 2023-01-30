@@ -14,13 +14,13 @@ const schemaUtente = new mongoose.Schema({
     cognome: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
-    salt: {type:String, required: true},
+    salt: { type: String, required: true },
     confermaAccount: { type: Boolean, default: false },
-    metodoPagamento: {schemaMetodoPagamento},
+    metodoPagamento: { schemaMetodoPagamento },
     telefono: String,
     indirizzo: String,
-    livello: {type: Number, default: 1}, //1=utente normale, 2=segreteria
-    URLfoto: { type: String, default: "images/utenti/default.png" },
+    livello: { type: Number, default: 1 }, //1=utente normale, 2=segreteria
+    URLfoto: { type: String, default: "/images/utenti/default.png" },
 });
 
 const Utente = mongoose.model("Utente", schemaUtente, "utenti");
