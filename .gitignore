@@ -3,3 +3,7 @@ node_modules/
 
 # Escludere il file .env per evitare di pubblicare informazioni riservate
 .env
+
+# Escludo le immagini caricate dal frontend
+images/utenti/*
+!images/utenti/default.png
