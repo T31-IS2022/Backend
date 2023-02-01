@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const servizioMail = require('../scripts/email');
 //includo l'ObjectId per poter cercare elementi tramite il loro ID
 var ObjectId = require("mongodb").ObjectId;
+const fs = require('node:fs');
 
 function generaToken(data) {
     return jwt.sign({ data }, process.env.JWT_KEY, { expiresIn: 86400 });
@@ -147,8 +148,7 @@ const registrazione = (req, res) => {
     const password = body.password;
     const telefono = body.telefono || undefined;
     const indirizzo = body.indirizzo || undefined;
-    const foto = body.URLfoto || undefined;
-
+    
     //controllo se un utente con questa email è già stato inserito nel database
     Utente.findOne({ email: email }, (err, data) => {
         if (err) 
@@ -160,6 +160,15 @@ const registrazione = (req, res) => {
         const salt = crypto.randomBytes(16).toString('hex');
         const hashedPsw = hashPassword(password, salt);
 
+        const foto = req.file;
+        if (foto){
+            const path = foto.path;
+            const estensioneFile = foto.originalname.match(/^.*(?<estensione>\.(png|jpg))$/).groups.estensione;
+            var newPath = `${path}${estensioneFile}`
+            fs.renameSync(path,newPath);
+            console.log(foto);
+        }
+
         const nuovoUtente = new Utente({
             nome: nome,
             cognome: cognome,
@@ -167,7 +176,7 @@ const registrazione = (req, res) => {
             password: hashedPsw,
             telefono: telefono,
             indirizzo: indirizzo,
-            URLfoto: foto,
+            URLfoto: newPath,
             salt: salt
         });
 

@@ -3,7 +3,7 @@ const tokenChecker = require("../scripts/authentication");
 
 //includo multer per poter leggere i dati dello spazio dal form
 const multer = require("multer");
-const upload = multer();
+const upload = multer({dest: 'images/utenti'});
 
 //creo l'oggetto router che gestisce le routes
 const router = express.Router();
@@ -13,7 +13,7 @@ const controllerUtente = require("../controllers/utente");
 
 //creo le mie routes con la funzione di callback definita nel controller
 router.post("/login", upload.none(), controllerUtente.loginUtente);
-router.post("/registrazione", upload.none(), controllerUtente.registrazione);
+router.post("/registrazione", upload.single('foto'), controllerUtente.registrazione);
 router.get("/byEmail", tokenChecker(1), controllerUtente.getUtenteConEmail);
 router.get("/byID", tokenChecker(2), controllerUtente.getUtenteConID);
 router.get("/", tokenChecker(2), controllerUtente.listaUtenti);
