@@ -151,10 +151,9 @@ const registrazione = (req, res) => {
         const foto = req.file;
         if (foto) {
             const path = foto.path;
-            const estensioneFile = foto.originalname.match(/^.*(?<estensione>\.(png|jpg))$/).groups
-                .estensione;
-            var newPath = `${path}${estensioneFile}`;
+            var newPath = `${path}.png`;
             fs.renameSync(path, newPath);
+            newPath = `/${newPath}`;    
             console.log(foto);
         }
 
@@ -165,7 +164,7 @@ const registrazione = (req, res) => {
             password: hashedPsw,
             telefono: telefono,
             indirizzo: indirizzo,
-            URLfoto: "/" + newPath,
+            URLfoto: newPath,
             salt: salt,
         });
 
