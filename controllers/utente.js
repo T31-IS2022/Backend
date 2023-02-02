@@ -1,8 +1,10 @@
-//includo il modello dello spazio per poterlo usare qui
 const Utente = require("../models/utente");
 const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
+
 const servizioMail = require("../scripts/email");
+const emailTemplates = require("../scripts/emailTemplates");
+
 //includo l'ObjectId per poter cercare elementi tramite il loro ID
 var ObjectId = require("mongodb").ObjectId;
 const fs = require("node:fs");
@@ -176,12 +178,18 @@ const registrazione = (req, res) => {
             const id = data._id;
             servizioMail
                 .sendMail({
-                    from: `t31 <noreply.${process.env.EMAIL_ADDR}>`,
+                    from: `Progetto Oratorio - Gruppo T31 <noreply.${process.env.EMAIL_ADDR}>`,
                     replyTo: `noreply.${process.env.EMAIL_ADDR}`,
                     to: email,
-                    subject: "Conferma account Makako",
-                    text: "Conferma il tuo account Makako per poter utilizzare il tuo account",
-                    html: `<h1>Conferma il tuo account Makako</h1><p>Attiva ora l'account ${nome} ${cognome}</p><br/><a href="${process.env.WEB_ADDR}/utente/conferma?id=${id}">Conferma!</a>`,
+                    subject: "Conferma la registrazione",
+                    text: emailTemplates.textEmailConferma(
+                        nome,
+                        `${process.env.WEB_ADDR}/utente/conferma?id=${id}`
+                    ),
+                    html: emailTemplates.htmlEmailConferma(
+                        nome,
+                        `${process.env.WEB_ADDR}/utente/conferma?id=${id}`
+                    ),
                 })
                 .then((info) => {
                     console.log(info);
