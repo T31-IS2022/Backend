@@ -122,7 +122,7 @@ const htmlEmailConferma = function (nomeUtente, linkConferma) {
                 <div class="content" style="box-sizing: border-box; display: block; margin: 0 auto; max-width: 580px; padding: 10px;">
 
                     <!-- START CENTERED WHITE CONTAINER -->
-                    <table role="presentation" class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background: #ffffff; border-radius: 3px; width: 100%;" width="100%">
+                    <table role="presentation" class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background: #ffffff; border-radius: 0px 20px 0px 20px; width: 100%;" width="100%">
 
                     <!-- START MAIN CONTENT AREA -->
                     <tr>
@@ -141,7 +141,7 @@ const htmlEmailConferma = function (nomeUtente, linkConferma) {
                                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
                                         <tbody>
                                             <tr>
-                                            <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #3498db;" valign="top" align="center" bgcolor="#3498db"> <a href="` +
+                                            <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 0px 10px 0px 10px; text-align: center; background-color: #3498db;" valign="top" align="center" bgcolor="#3498db"> <a href="` +
         linkConferma +
         `" target="_blank" style="border: solid 1px #3498db; border-radius: 0px 10px 0px 10px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-decoration: none; background-color: #3498db; border-color: #3498db; color: #ffffff;">Conferma la registrazione</a> </td>
                                             </tr>
