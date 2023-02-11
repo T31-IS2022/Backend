@@ -313,7 +313,11 @@ const modificaUtente = (req, res) => {
         //salvo le modifiche
         data.save((err, data) => {
             if (err) return res.status(500).json({ code: 500, message: err }); //risposta in caso di errore
-            return res.status(200).json(data); //risposta se l'utente è stato salvato nel database
+            const token = generaToken(data);
+            return res.status(200).json({
+                utente: data,
+                token: token
+            });
         });
     });
 };
