@@ -153,7 +153,7 @@ const registrazione = (req, res) => {
             const path = foto.path;
             var newPath = `${path}.png`;
             fs.renameSync(path, newPath);
-            newPath = `/${newPath}`;    
+            newPath = `/${newPath}`;
             console.log(foto);
         }
 
@@ -182,12 +182,14 @@ const registrazione = (req, res) => {
                     to: email,
                     subject: "Conferma la registrazione",
                     text: emailTemplates.textEmailConferma(
+                        //nome,`${process.env.WEB_ADDR}/utente/conferma?id=${id}`
                         nome,
-                        `${process.env.WEB_ADDR}/utente/conferma?id=${id}`
+                        `${process.env.FRONTEND_ADDR}/conferma.html?id=${id}`
                     ),
                     html: emailTemplates.htmlEmailConferma(
+                        //nome, `${process.env.WEB_ADDR}/utente/conferma?id=${id}`
                         nome,
-                        `${process.env.WEB_ADDR}/utente/conferma?id=${id}`
+                        `${process.env.FRONTEND_ADDR}/conferma.html?id=${id}`
                     ),
                 })
                 .then((info) => {
