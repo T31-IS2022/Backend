@@ -293,12 +293,20 @@ const modificaUtente = (req, res) => {
     const password = body.password;
     const telefono = body.telefono || undefined;
     const indirizzo = body.indirizzo || undefined;
-    const foto = body.URLfoto || undefined;
 
     //cerco e modifico l'utente con quella email
     Utente.findOne({ _id: ObjectId(id) }, (err, data) => {
         if (err) return res.status(500).json({ code: 500, message: err });
         if (!data) return res.status(404).json({ message: "L'utente richiesto non esiste" });
+
+        const foto = req.file;
+        if (foto) {
+            const path = foto.path;
+            var newPath = `${path}.png`;
+            fs.renameSync(path, newPath);
+            newPath = `/${newPath}`;
+            console.log(foto);
+        }
 
         //modifiche all'utente
         data.nome = nome;
@@ -307,7 +315,7 @@ const modificaUtente = (req, res) => {
         data.password = hashPassword(password, data.salt);
         data.telefono = telefono;
         data.indirizzo = indirizzo;
-        data.URLfoto = foto;
+        data.URLfoto = newPath;
         data.salt = data.salt;
 
         //salvo le modifiche
@@ -316,7 +324,7 @@ const modificaUtente = (req, res) => {
             const token = generaToken(data);
             return res.status(200).json({
                 utente: data,
-                token: token
+                token: token,
             });
         });
     });
