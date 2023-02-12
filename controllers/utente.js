@@ -139,10 +139,13 @@ const registrazione = (req, res) => {
     //controllo se un utente con questa email è già stato inserito nel database
     Utente.findOne({ email: email }, (err, data) => {
         if (err) return res.status(500).json({ code: 500, message: err });
-        if (data)
+        if (data){
+            if (req.file)
+                fs.rmSync(req.file.path);
             return res
                 .status(409)
                 .json({ code: 409, message: "E' già presente un utente con questa e-mail" });
+        }
 
         //se non l'ho inserito creo un nuovo utente con i dati provenienti dalla richiesta
         const salt = crypto.randomBytes(16).toString("hex");
@@ -268,6 +271,7 @@ const getUtenteConID = (req, res) => {
 //modifica le informazioni di un utente data l'email
 const modificaUtente = (req, res) => {
     console.log("Modifica di un utente\n\tParametri: " + JSON.stringify(req.params));
+    console.log(req.body)
 
     if (!req.params || !req.params.id) {
         return res.status(400).json({ code: 400, message: "id non specificato" });
@@ -281,47 +285,52 @@ const modificaUtente = (req, res) => {
     }
 
     const body = req.body;
-    if (!body || !(body.email && body.nome && body.cognome && body.password))
+    if (!body || !(body.email && body.nome && body.cognome))
         return res.status(400).json({ code: 400, message: "Parametri mancanti" });
 
     if (req.utente.livello < 2 && req.utente._id != id)
         return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
-
-    const nome = body.nome;
-    const cognome = body.cognome;
-    const email = body.email;
-    const password = body.password;
-    const telefono = body.telefono || undefined;
-    const indirizzo = body.indirizzo || undefined;
 
     //cerco e modifico l'utente con quella email
     Utente.findOne({ _id: ObjectId(id) }, (err, data) => {
         if (err) return res.status(500).json({ code: 500, message: err });
         if (!data) return res.status(404).json({ message: "L'utente richiesto non esiste" });
 
+        const nome = body.nome;
+        const cognome = body.cognome;
+        const email = body.email;
+        const password = body.password?hashPassword(body.password, data.salt) : data.password;
+        const telefono = body.telefono || undefined;
+        const indirizzo = body.indirizzo || undefined;
+
         //cancello la vecchia foto profilo dell'utente
-        if (data.URLfoto != "/images/utenti/default.png") {
+        const foto = req.file;
+        if (foto && data.URLfoto != "/images/utenti/default.png") {
             const pathFoto = data.URLfoto.substring(1);
-            fs.unlinkSync(pathFoto);
+            fs.rmSync(pathFoto);
         }
 
-        const foto = req.file;
         if (foto) {
-            const path = foto.path;
-            var newPath = `${path}.png`;
-            fs.renameSync(path, newPath);
-            newPath = `/${newPath}`;
-            console.log(foto);
+            if (foto.originalname=='defaultPicture.png'){
+                var newPath = '/images/utenti/default.png'
+                fs.rmSync(req.file.path);
+            }else{
+                const path = foto.path;
+                var newPath = `${path}.png`;
+                fs.renameSync(path, newPath);
+                newPath = `/${newPath}`;
+                console.log(foto);
+            }
         }
 
         //modifiche all'utente
         data.nome = nome;
         data.cognome = cognome;
         data.email = email;
-        data.password = hashPassword(password, data.salt);
+        data.password = password;
         data.telefono = telefono;
         data.indirizzo = indirizzo;
-        data.URLfoto = newPath;
+        data.URLfoto = newPath || data.URLfoto;
         data.salt = data.salt;
 
         //salvo le modifiche
