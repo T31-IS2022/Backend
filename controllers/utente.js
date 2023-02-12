@@ -299,6 +299,12 @@ const modificaUtente = (req, res) => {
         if (err) return res.status(500).json({ code: 500, message: err });
         if (!data) return res.status(404).json({ message: "L'utente richiesto non esiste" });
 
+        //cancello la vecchia foto profilo dell'utente
+        if (data.URLfoto != "/images/utenti/default.png") {
+            const pathFoto = data.URLfoto.substring(1);
+            fs.unlinkSync(pathFoto);
+        }
+
         const foto = req.file;
         if (foto) {
             const path = foto.path;
@@ -350,6 +356,12 @@ const cancellaUtente = (req, res) => {
         if (err) return res.status(500).json({ code: 500, message: err });
         if (!data)
             return res.status(404).json({ code: 404, message: "L'utente richiesto non esiste" });
+
+        //cancello la foto profilo dell'utente
+        if (data.URLfoto != "/images/utenti/default.png") {
+            const pathFoto = data.URLfoto.substring(1);
+            fs.unlinkSync(pathFoto);
+        }
 
         //cerco ed elimino l'utente con quell'ID
         Utente.findOneAndDelete({ _id: ObjectId(id) }, (err) => {
