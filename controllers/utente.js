@@ -139,9 +139,8 @@ const registrazione = (req, res) => {
     //controllo se un utente con questa email è già stato inserito nel database
     Utente.findOne({ email: email }, (err, data) => {
         if (err) return res.status(500).json({ code: 500, message: err });
-        if (data){
-            if (req.file)
-                fs.rmSync(req.file.path);
+        if (data) {
+            if (req.file) fs.rmSync(req.file.path);
             return res
                 .status(409)
                 .json({ code: 409, message: "E' già presente un utente con questa e-mail" });
@@ -271,7 +270,7 @@ const getUtenteConID = (req, res) => {
 //modifica le informazioni di un utente data l'email
 const modificaUtente = (req, res) => {
     console.log("Modifica di un utente\n\tParametri: " + JSON.stringify(req.params));
-    console.log(req.body)
+    console.log(req.body);
 
     if (!req.params || !req.params.id) {
         return res.status(400).json({ code: 400, message: "id non specificato" });
@@ -299,7 +298,7 @@ const modificaUtente = (req, res) => {
         const nome = body.nome;
         const cognome = body.cognome;
         const email = body.email;
-        const password = body.password?hashPassword(body.password, data.salt) : data.password;
+        const password = body.password ? hashPassword(body.password, data.salt) : data.password;
         const telefono = body.telefono || undefined;
         const indirizzo = body.indirizzo || undefined;
 
@@ -311,10 +310,10 @@ const modificaUtente = (req, res) => {
         }
 
         if (foto) {
-            if (foto.originalname=='defaultPicture.png'){
-                var newPath = '/images/utenti/default.png'
+            if (foto.originalname == "defaultPicture.png") {
+                var newPath = "/images/utenti/default.png";
                 fs.rmSync(req.file.path);
-            }else{
+            } else {
                 const path = foto.path;
                 var newPath = `${path}.png`;
                 fs.renameSync(path, newPath);
