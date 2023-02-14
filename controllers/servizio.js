@@ -4,17 +4,13 @@ const Ricorrenza = require("../models/ricorrenza");
 var ObjectId = require("mongodb").ObjectId;
 
 const listaServizi = (req, res) => {
-    console.log(
-        `Richiesta di una lista di servizi \n${JSON.stringify(req.query)}`
-    );
+    console.log(`Richiesta di una lista di servizi \n${JSON.stringify(req.query)}`);
 
     const count = parseInt(req.query.count || 50);
     const start = parseInt(req.query.start || 0);
 
     if (isNaN(count) || isNaN(start)) {
-        return res
-            .status(400)
-            .json({ code: 400, message: "start e count devono essere interi" });
+        return res.status(400).json({ code: 400, message: "start e count devono essere interi" });
     }
     if (count < 1 || start < 0) {
         return res.status(400).json({
@@ -28,7 +24,7 @@ const listaServizi = (req, res) => {
         .limit(count)
         .then((data) => {
             if (!data)
-                return res.status(204).json({code:204, message:"Nessun servizio trovato"});
+                return res.status(204).json({ code: 204, message: "Nessun servizio trovato" });
             return res.status(200).json(data);
         })
         .catch((err) => {
@@ -37,9 +33,7 @@ const listaServizi = (req, res) => {
 };
 
 const getID = (req, res) => {
-    console.log(
-        `Richiesta di un servizio tramite ID \n${JSON.stringify(req.query)}`
-    );
+    console.log(`Richiesta di un servizio tramite ID \n${JSON.stringify(req.query)}`);
 
     const id = req.query.id;
     if (!id) {
@@ -79,17 +73,13 @@ const getDisponibilita = (req, res) => {
         return res.status(400).json({
             code: 400,
             message: `Parametri mancanti: ${
-                (!id ? "id, " : "") +
-                (!inizio ? "inizio, " : "") +
-                (!fine ? "fine" : "")
+                (!id ? "id, " : "") + (!inizio ? "inizio, " : "") + (!fine ? "fine" : "")
             }`,
         });
     }
 
     if (!ObjectId.isValid(id)) {
-        return res
-            .status(400)
-            .json({ code: 400, message: `L'id '${id}' non è valido` });
+        return res.status(400).json({ code: 400, message: `L'id '${id}' non è valido` });
     }
 
     Servizio.count({ _id: ObjectId(id) })
@@ -133,14 +123,10 @@ const getDisponibilita = (req, res) => {
 };
 
 const crea = (req, res) => {
-    console.log(
-        `Richiesta di creazione nuovo spazio \n${JSON.stringify(req.body)}`
-    );
+    console.log(`Richiesta di creazione nuovo spazio \n${JSON.stringify(req.body)}`);
 
     if (!req.body) {
-        return res
-            .status(400)
-            .json({ code: 400, message: "Parametro mancante: nome" });
+        return res.status(400).json({ code: 400, message: "Parametro mancante: nome" });
     }
 
     const nome = req.body.nome;
@@ -167,28 +153,24 @@ const crea = (req, res) => {
     });
     console.log(`Nuovo servizio: \n${nuovoServizio}`);
     nuovoServizio
-    .save()
-    .then((data) => {
-        return res.status(201).json({ data });
-    })
-    .catch((err) => {
-        return res
-            .status(500)
-            .json({ code: 500, message: err });
-    });
+        .save()
+        .then((data) => {
+            return res.status(201).json(data);
+        })
+        .catch((err) => {
+            return res.status(500).json({ code: 500, message: err });
+        });
 };
 
 const modifica = (req, res) => {
     console.log(
-        `Richiesta di modifica di un servizio \n${JSON.stringify(
-            req.params
-        )}\n${JSON.stringify(req.body)}`
+        `Richiesta di modifica di un servizio \n${JSON.stringify(req.params)}\n${JSON.stringify(
+            req.body
+        )}`
     );
 
     if (!req.body) {
-        return res
-            .status(400)
-            .json({ code: 400, message: "Body della richiesta mancante" });
+        return res.status(400).json({ code: 400, message: "Body della richiesta mancante" });
     }
 
     const id = req.params.id;
@@ -200,9 +182,7 @@ const modifica = (req, res) => {
     const foto = req.body.foto;
 
     if (!id) {
-        return res
-            .status(400)
-            .json({ code: 400, message: "id non specificato" });
+        return res.status(400).json({ code: 400, message: "id non specificato" });
     }
 
     Servizio.findOne({ _id: ObjectId(id) })
@@ -247,11 +227,7 @@ const modifica = (req, res) => {
 };
 
 const cancella = (req, res) => {
-    console.log(
-        `Richiesta di eliminazione di un servizio \n${JSON.stringify(
-            req.params
-        )}`
-    );
+    console.log(`Richiesta di eliminazione di un servizio \n${JSON.stringify(req.params)}`);
 
     const id = req.params.id;
     if (!id) {

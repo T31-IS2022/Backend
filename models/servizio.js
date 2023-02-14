@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const positiveNumber = {
     type: Number,
@@ -16,7 +16,7 @@ const schemaServizio = new mongoose.Schema({
     tipologia: String,
     prezzoIniziale: positiveNumber,
     prezzoOra: positiveNumber,
-    URLfoto: {type: String, default: "images/servizi/default.png"},
+    URLfoto: { type: String, default: "/images/servizi/default.png" },
 });
 
 const Servizio = mongoose.model("Servizio", schemaServizio, "servizi");
