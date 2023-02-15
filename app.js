@@ -15,9 +15,7 @@ console.log("Application started");
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 app.use(cp());
-app.use(cors({
-    origin: [process.env.FRONTEND_ADDR]
-}));
+app.use(cors());
 
 app.use("/images", express.static("images"));
 
