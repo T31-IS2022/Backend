@@ -12,8 +12,10 @@ const swaggerDocument = require("./swagger.json");
 
 console.log("Application started");
 
+const FRONTEND_ADDR = process.env.FRONTEND_ADDR;
+console.log(`aloowed origin: ${FRONTEND_ADDR}`)
 app.use(cors({
-    origin: ['https://t31-is2022.github.io']
+    origin: [FRONTEND_ADDR]
 }));
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
