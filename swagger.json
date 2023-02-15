@@ -13,7 +13,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:3000",
+    "host": "gruppo-t31-api.onrender.com",
     "basePath": "/",
     "tags": [
         {
@@ -37,7 +37,7 @@
             "description": "API per le ricorrenze del sistema"
         }
     ],
-    "schemes": ["http"],
+    "schemes": ["http", "https"],
     "paths": {
         "/utente/registrazione": {
             "post": {
@@ -105,13 +105,16 @@
                         "schema": { "$ref": "#/definitions/Utente" }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "409": {
-                        "description": "Conflict - E' già presente un utente con l'email specificata"
+                        "description": "Conflict - E' già presente un utente con l'email specificata",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -155,13 +158,16 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati oppure l'utente deve confermare la sua registrazione"
+                        "description": "Bad request - I parametri richiesti non sono specificati oppure l'utente deve confermare la sua registrazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un utente con l'email fornita non esiste"
+                        "description": "Not found - Un utente con l'email fornita non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -203,13 +209,16 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - ID non specificato o non valido"
+                        "description": "Bad request - ID non specificato o non valido",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                        "description": "Not found - Un utente con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -254,19 +263,36 @@
                         }
                     },
                     "204": {
-                        "description": "No content - Nessun utente da restituire"
+                        "description": "No content - Nessun utente da restituire",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP"
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione"
+                                }
+                            }
+                        }
                     },
                     "400": {
-                        "description": "Bad request - I valori di start e count non sono coerenti"
+                        "description": "Bad request - I valori di start e count non sono coerenti",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -301,19 +327,24 @@
                         "schema": { "$ref": "#/definitions/Utente" }
                     },
                     "400": {
-                        "description": "Bad request - ID non specificato"
+                        "description": "Bad request - ID non specificato",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                        "description": "Not found - Un utente con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -348,19 +379,69 @@
                         "schema": { "$ref": "#/definitions/Utente" }
                     },
                     "400": {
-                        "description": "Bad request - Email non specificata"
+                        "description": "Bad request - Email non specificata",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un utente con l'email fornita non esiste"
+                        "description": "Not found - Un utente con l'email fornita non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    }
+                }
+            }
+        },
+        "/utente/byToken": {
+            "get": {
+                "tags": ["utente"],
+                "summary": "Ottenere un utente tramite un token di accesso",
+                "description": "",
+                "operationId": "getUtenteConToken",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "Token legato all'utente da restituire",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": { "$ref": "#/definitions/Utente" }
+                    },
+                    "400": {
+                        "description": "Bad request - Token non specificato",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "404": {
+                        "description": "Not found - Un utente legato al token fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -456,19 +537,24 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                        "description": "Not found - Un utente con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             },
@@ -515,19 +601,24 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                        "description": "Not found - Un utente con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -608,16 +699,20 @@
                         "schema": { "$ref": "#/definitions/Spazio" }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             },
@@ -652,11 +747,31 @@
                             "items": { "$ref": "#/definitions/Spazio" }
                         }
                     },
+                    "204": {
+                        "description": "No content - Nessuno spazio da restituire",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 204
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Nessuno spazio da restituire"
+                                }
+                            }
+                        }
+                    },
                     "400": {
-                        "description": "Bad request - I valori di start e count non sono coerenti"
+                        "description": "Bad request - I valori di start e count non sono coerenti",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -684,10 +799,12 @@
                         "schema": { "$ref": "#/definitions/Spazio" }
                     },
                     "404": {
-                        "description": "Not found - Uno spazio con l'ID fornito non esiste"
+                        "description": "Not found - Uno spazio con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -750,13 +867,16 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti"
+                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Uno spazio con l'ID fornito non esiste"
+                        "description": "Not found - Uno spazio con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -844,16 +964,24 @@
                         "schema": { "$ref": "#/definitions/Spazio" }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "404": {
+                        "description": "Not found - Uno spazio con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             },
@@ -900,19 +1028,24 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Uno spazio con l'ID fornito non esiste"
+                        "description": "Not found - Uno spazio con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -985,16 +1118,20 @@
                         "schema": { "$ref": "#/definitions/Servizio" }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             },
@@ -1029,11 +1166,31 @@
                             "items": { "$ref": "#/definitions/Servizio" }
                         }
                     },
+                    "204": {
+                        "description": "No content - Nessun servizio da restituire",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 204
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Nessun servizio da restituire"
+                                }
+                            }
+                        }
+                    },
                     "400": {
-                        "description": "Bad request - I valori di start e count non sono coerenti"
+                        "description": "Bad request - I valori di start e count non sono coerenti",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1061,13 +1218,16 @@
                         "schema": { "$ref": "#/definitions/Servizio" }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un servizio con l'ID fornito non esiste"
+                        "description": "Not found - Un servizio con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1130,13 +1290,16 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti"
+                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un servizio con l'ID fornito non esiste"
+                        "description": "Not found - Un servizio con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1216,16 +1379,24 @@
                         "schema": { "$ref": "#/definitions/Servizio" }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "404": {
+                        "description": "Not found - Un servizio con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             },
@@ -1272,19 +1443,24 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un servizio con l'ID fornito non esiste"
+                        "description": "Not found - Un servizio con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1358,16 +1534,20 @@
                         "schema": { "$ref": "#/definitions/Prenotazione" }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati"
+                        "description": "Bad request - I parametri richiesti non sono specificati",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1402,16 +1582,20 @@
                         "schema": { "$ref": "#/definitions/Prenotazione" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Un utente con l'ID fornito non esiste"
+                        "description": "Not found - Un utente con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1446,16 +1630,20 @@
                         "schema": { "$ref": "#/definitions/Prenotazione" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Una prenotazione con l'ID fornito non esiste"
+                        "description": "Not found - Una prenotazione con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1493,16 +1681,20 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Una prenotazione con l'ID fornito non esiste"
+                        "description": "Not found - Una prenotazione con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1600,16 +1792,20 @@
                         "schema": { "$ref": "#/definitions/Prenotazione" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Una prenotazione con l'ID fornito non esiste"
+                        "description": "Not found - Una prenotazione con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             },
@@ -1642,16 +1838,20 @@
                         "schema": { "$ref": "#/definitions/Prenotazione" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Una prenotazione con l'ID fornito non esiste"
+                        "description": "Not found - Una prenotazione con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1686,16 +1886,20 @@
                         "schema": { "$ref": "#/definitions/Ricorrenza" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Una ricorrenza con l'ID fornito non esiste"
+                        "description": "Not found - Una ricorrenza con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1742,16 +1946,20 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti"
+                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -1818,19 +2026,24 @@
                         "schema": { "$ref": "#/definitions/Ricorrenza" }
                     },
                     "400": {
-                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti"
+                        "description": "Bad request - I parametri richiesti non sono specificati o non sono coerenti",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Una ricorrenza con l'ID fornito non esiste"
+                        "description": "Not found - Una ricorrenza con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             },
@@ -1863,16 +2076,20 @@
                         "schema": { "$ref": "#/definitions/Ricorrenza" }
                     },
                     "401": {
-                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login"
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "403": {
-                        "description": "Forbidden - Il livello di privilegio non è sufficiente"
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "404": {
-                        "description": "Not found - Una ricorrenza con l'ID fornito non esiste"
+                        "description": "Not found - Una ricorrenza con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
-                        "description": "Internal server error - Errore imprevisto durante l'operazione"
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
             }
@@ -2095,6 +2312,20 @@
                     "type": "array",
                     "items": { "$ref": "#/definitions/Servizio" },
                     "description": "Lista dei servizi utilizzati in questa ricorrenza"
+                }
+            }
+        },
+        "ErroreAPI": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "description": "Codice di risposta HTTP"
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Messaggio di testo sull'errore"
                 }
             }
         }

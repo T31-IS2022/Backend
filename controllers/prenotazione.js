@@ -23,6 +23,71 @@ const populateRicorrenze = {
     },
 };
 
+//FUNZIONI PER LE VARIE ROUTES
+
+const tutti = (req, res) => {
+    console.log("Richiesta lista prenotazioni");
+
+    const count = parseInt(req.query.count || 50);
+    const start = parseInt(req.query.start || 0);
+
+    if (isNaN(count) || isNaN(start)) {
+        return res.status(400).json({ code: 400, message: "start e count devono essere interi" });
+    }
+    if (count < 1 || start < 0) {
+        return res.status(400).json({
+            code: 400,
+            message: "start deve essere positivo e count maggiore di 0",
+        });
+    }
+
+    Prenotazione.find({})
+        .skip(start)
+        .limit(count)
+        .populate(populateSpazi)
+        .populate(populateRicorrenze)
+        .then((data) => {
+            if (!data)
+                return res.status(204).json({ code: 204, message: "Nessua prenotazione trovata" });
+            return res.status(200).json(data);
+        })
+        .catch((err) => {
+            return res.status(500).json({ code: 500, message: err });
+        });
+};
+
+// get prenotazioni di un utente
+const getPrenotazioniUtente = (req, res) => {
+    console.log(
+        "Richieste prenotazioni di un utente\n\tQuery: " +
+            JSON.stringify(req.query) +
+            "\n\tParametri: " +
+            JSON.stringify(req.params)
+    );
+
+    let id = req.query.id;
+
+    if (req.utente.livello < 2 && req.utente._id != id)
+        return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
+
+    Utente.findOne({ _id: ObjectId(id) }, (err, data) => {
+        if (err) return res.status(500).json({ code: 500, message: err });
+        if (!data)
+            return res.status(404).json({
+                code: 404,
+                message: "Utente non esiste",
+            });
+        // trova le prenotazioni dell'utente e le ritorna
+        Prenotazione.find({ proprietario: id })
+            .populate(populateSpazi)
+            .populate(populateRicorrenze)
+            .exec((err, data) => {
+                if (err) return res.status(500).json({ code: 500, message: err });
+                return res.status(200).json(data);
+            });
+    });
+};
+
 // get prenotazione by id
 const getPrenotazioneConID = (req, res) => {
     console.log(
@@ -35,9 +100,7 @@ const getPrenotazioneConID = (req, res) => {
     const id = req.query.id;
 
     if (req.utente.livello < 2 && req.utente._id != id)
-        return res
-            .status(403)
-            .json({ code: 403, message: "Utente non autorizzato" });
+        return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
 
     // populate Object nested in array ( ricorrenze[i].spaziPrenotati e ricorrenze[i].serviziPrenotati)
     Prenotazione.findOne({ _id: ObjectId(id) })
@@ -54,41 +117,6 @@ const getPrenotazioneConID = (req, res) => {
         });
 };
 
-// get prenotazioni di un utente
-const getPrenotazioniUtente = (req, res) => {
-    console.log(
-        "Richieste prenotazioni di un utente\n\tQuery: " +
-            JSON.stringify(req.query) +
-            "\n\tParametri: " +
-            JSON.stringify(req.params)
-    );
-
-    let id = req.query.id;
-
-    if (req.utente.livello < 2 && req.utente._id != id)
-        return res
-            .status(403)
-            .json({ code: 403, message: "Utente non autorizzato" });
-
-    Utente.findOne({ _id: ObjectId(id) }, (err, data) => {
-        if (err) return res.status(500).json({ code: 500, message: err });
-        if (!data)
-            return res.status(404).json({
-                code: 404,
-                message: "Utente non esiste",
-            });
-        // trova le prenotazioni dell'utente e le ritorna
-        Prenotazione.find({ proprietario: id })
-            .populate(populateSpazi)
-            .populate(populateRicorrenze)
-            .exec((err, data) => {
-                if (err)
-                    return res.status(500).json({ code: 500, message: err });
-                return res.status(200).json(data);
-            });
-    });
-};
-
 // get tutte le ricorrenze di una prenotazione
 const getRicorrenzePrenotazione = (req, res) => {
     console.log(
@@ -101,9 +129,7 @@ const getRicorrenzePrenotazione = (req, res) => {
     const id = req.query.id;
 
     if (req.utente.livello < 2 && req.utente._id != id)
-        return res
-            .status(403)
-            .json({ code: 403, message: "Utente non autorizzato" });
+        return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
 
     Prenotazione.findOne({ _id: ObjectId(id) })
         .populate(populateSpazi)
@@ -181,29 +207,43 @@ const nuovaPrenotazione = async (req, res) => {
     Promise.all(promises).then((ricorrenzeInserite) => {
         let costo = 0;
         const calcoloCosti = [];
-        for (let ricorrenza of ricorrenzeInserite){
-            calcoloCosti.push(Servizio.find({_id: {$in: ricorrenza.serviziPrenotati.map(id=>ObjectId(id))}})
-            .then(servizi=>{
-                for (let servizio of servizi){
-                    costo += servizio.prezzoIniziale;
-                    costo += servizio.prezzoOra * new Date(dataFine-dataInizio).getTime()/1000/60/60;
-                }
-            }).catch(err=>{
-                return res.status(500).json({code:500, message:err});
-            }));
+        for (let ricorrenza of ricorrenzeInserite) {
+            calcoloCosti.push(
+                Servizio.find({
+                    _id: { $in: ricorrenza.serviziPrenotati.map((id) => ObjectId(id)) },
+                })
+                    .then((servizi) => {
+                        for (let servizio of servizi) {
+                            costo += servizio.prezzoIniziale;
+                            costo +=
+                                (servizio.prezzoOra * new Date(dataFine - dataInizio).getTime()) /
+                                1000 /
+                                60 /
+                                60;
+                        }
+                    })
+                    .catch((err) => {
+                        return res.status(500).json({ code: 500, message: err });
+                    })
+            );
 
-            calcoloCosti.push(Spazio.find({_id: {$in: ricorrenza.spaziPrenotati.map(id=>ObjectId(id))}})
-            .then(spazi=>{
-                for (let spazio of spazi) {
-                    costo += spazio.prezzoIniziale;
-                    costo += spazio.prezzoOra * (new Date(dataFine-dataInizio).getTime()/1000/60/60);
-                }
-            }).catch(err=>{
-                return res.status(500).json({code:500, message:err});
-            }));
+            calcoloCosti.push(
+                Spazio.find({ _id: { $in: ricorrenza.spaziPrenotati.map((id) => ObjectId(id)) } })
+                    .then((spazi) => {
+                        for (let spazio of spazi) {
+                            costo += spazio.prezzoIniziale;
+                            costo +=
+                                spazio.prezzoOra *
+                                (new Date(dataFine - dataInizio).getTime() / 1000 / 60 / 60);
+                        }
+                    })
+                    .catch((err) => {
+                        return res.status(500).json({ code: 500, message: err });
+                    })
+            );
         }
 
-        Promise.all(calcoloCosti).then(processi=>{
+        Promise.all(calcoloCosti).then((processi) => {
             const idInseriti = ricorrenzeInserite.map((ricorrenza) => {
                 return ricorrenza._id;
             });
@@ -218,7 +258,7 @@ const nuovaPrenotazione = async (req, res) => {
                 if (err) return res.status(500).json({ code: 500, message: err });
                 return res.status(201).json({ data });
             });
-        })
+        });
     });
 };
 
@@ -226,23 +266,17 @@ const nuovaPrenotazione = async (req, res) => {
 // (soprattutto la parte di aggiornamento ricorrenze, si potrebbero passare due campi nel body: uno contiene
 // gli id delle ricorrenze da rimuovere, un altro tutte le ricorrenze da aggiungere)
 const modificaPrenotazione = (req, res) => {
-    console.log(
-        "Modifica di una prenotazione\n\tParams: " + JSON.stringify(req.params)
-    );
+    console.log("Modifica di una prenotazione\n\tParams: " + JSON.stringify(req.params));
 
     let id = req.params.id;
 
     if (req.utente.livello < 2 && req.utente._id != id)
-        return res
-            .status(403)
-            .json({ code: 403, message: "Utente non autorizzato" });
+        return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
 
     Prenotazione.findOne({ _id: ObjectId(id) }, (err, data) => {
         if (err) return res.status(500).json({ code: 500, message: err });
         if (!data)
-            return res
-                .status(404)
-                .json({ code: 404, message: "La prenotazione non esiste" });
+            return res.status(404).json({ code: 404, message: "La prenotazione non esiste" });
 
         // modifica la prenotazione
         data.proprietario = req.body.proprietario;
@@ -259,16 +293,12 @@ const modificaPrenotazione = (req, res) => {
 
 // elimina prenotazione
 const eliminaPrenotazione = (req, res) => {
-    console.log(
-        "Elimina prenotazione\n\tParametri: " + JSON.stringify(req.params)
-    );
+    console.log("Elimina prenotazione\n\tParametri: " + JSON.stringify(req.params));
 
     let id = req.params.id;
 
     if (req.utente.livello < 2 && req.utente._id != id)
-        return res
-            .status(403)
-            .json({ code: 403, message: "Utente non autorizzato" });
+        return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
 
     Prenotazione.findOne({ _id: ObjectId(id) }, (err, data) => {
         if (err) return res.status(500).json({ code: 500, message: err });
@@ -277,61 +307,27 @@ const eliminaPrenotazione = (req, res) => {
                 code: 404,
                 message: "La prenotazione non esiste",
             });
- 
+
         const ricorrenze = data.ricorrenze;
-        Ricorrenza.deleteMany({_id: {$in:ricorrenze}})
-        .then(data=>{
-            Prenotazione.findOneAndDelete({ _id: ObjectId(id) }, (err, data) => {
-                if (err) return res.status(500).json({ code: 500, message: err });
-                return res.status(200).json(data);
+        Ricorrenza.deleteMany({ _id: { $in: ricorrenze } })
+            .then((data) => {
+                Prenotazione.findOneAndDelete({ _id: ObjectId(id) }, (err, data) => {
+                    if (err) return res.status(500).json({ code: 500, message: err });
+                    return res.status(200).json(data);
+                });
+            })
+            .catch((err) => {
+                return res.status(500).json({ code: 500, message: err });
             });
-        }).catch(err=>{
-            return res.status(500).json({ code: 500, message: err });
-        })
     });
 };
 
-const tutti = (req,res)=>{
-    console.log(
-        "Richiesta lista prenotazioni"
-    );
-
-    const count = parseInt(req.query.count || 50);
-    const start = parseInt(req.query.start || 0);
-
-    if (isNaN(count) || isNaN(start)) {
-        return res
-            .status(400)
-            .json({ code: 400, message: "start e count devono essere interi" });
-    }
-    if (count < 1 || start < 0) {
-        return res.status(400).json({
-            code: 400,
-            message: "start deve essere positivo e count maggiore di 0",
-        });
-    }
-
-    Prenotazione.find({})
-    .skip(start)
-    .limit(count)
-    .populate(populateSpazi)
-    .populate(populateRicorrenze)
-    .then((data) => {
-        if (!data)
-            return res.status(204).json({code:204, message:"Nessua prenotazione trovata"});
-        return res.status(200).json(data);
-    })
-    .catch((err) => {
-        return res.status(500).json({ code: 500, message: err });
-    });
-}
-
 module.exports = {
-    getPrenotazioneConID,
+    tutti,
     getPrenotazioniUtente,
+    getPrenotazioneConID,
     getRicorrenzePrenotazione,
     nuovaPrenotazione,
     modificaPrenotazione,
     eliminaPrenotazione,
-    tutti
 };

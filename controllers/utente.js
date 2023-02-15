@@ -85,40 +85,6 @@ const loginUtente = (req, res) => {
     });
 };
 
-const confermaUtente = (req, res) => {
-    const id = req.query.id;
-    if (!id) {
-        return res.status(400).json({ code: 400, message: "Parametro mancante: id" });
-    }
-    if (!ObjectId.isValid(id)) {
-        return res.status(400).json({ code: 400, message: "id invalido" });
-    }
-
-    Utente.findOne({ _id: ObjectId(id) })
-        .then((data) => {
-            if (!data) {
-                res.status(404).json({
-                    code: 404,
-                    message: `L'id '${id}' non corrisponde a nessun utente`,
-                });
-            }
-            data.confermaAccount = true;
-            data.save()
-                .then((data) => {
-                    return res.status(200).json({
-                        code: 200,
-                        message: `L'utente con l'id '${id}' è stato confermato`,
-                    });
-                })
-                .catch((err) => {
-                    return res.status(500).json({ code: 500, message: err });
-                });
-        })
-        .catch((err) => {
-            return res.status(500).json({ code: 500, message: err });
-        });
-};
-
 //registrazione di un nuovo utente
 const registrazione = (req, res) => {
     //stampo le info sulla richiesta
@@ -204,6 +170,41 @@ const registrazione = (req, res) => {
         });
     });
 };
+
+const confermaUtente = (req, res) => {
+    const id = req.query.id;
+    if (!id) {
+        return res.status(400).json({ code: 400, message: "Parametro mancante: id" });
+    }
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ code: 400, message: "id invalido" });
+    }
+
+    Utente.findOne({ _id: ObjectId(id) })
+        .then((data) => {
+            if (!data) {
+                res.status(404).json({
+                    code: 404,
+                    message: `L'id '${id}' non corrisponde a nessun utente`,
+                });
+            }
+            data.confermaAccount = true;
+            data.save()
+                .then((data) => {
+                    return res.status(200).json({
+                        code: 200,
+                        message: `L'utente con l'id '${id}' è stato confermato`,
+                    });
+                })
+                .catch((err) => {
+                    return res.status(500).json({ code: 500, message: err });
+                });
+        })
+        .catch((err) => {
+            return res.status(500).json({ code: 500, message: err });
+        });
+};
+
 //restituisce le info di uno utente data l'email
 const getUtenteConEmail = (req, res) => {
     console.log(
@@ -231,10 +232,11 @@ const getUtenteConEmail = (req, res) => {
             return res.status(200).json(data); //se trovo l'oggetto lo restituisco
         });
     } else {
-        return res.status(403).json({ code: 403, message: "Untente non autorizzato" });
+        return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
     }
 };
 
+//lo script di autenticazione decodifica il token, cerca l'utente corrispondente e lo aggiunge a req.utente
 const getUtenteConToken = (req, res) => {
     console.log(
         "Richiesto un utente tramite token\n\tQuery: " +
@@ -246,7 +248,7 @@ const getUtenteConToken = (req, res) => {
     if (req.utente) {
         return res.status(200).json(req.utente);
     } else {
-        return res.status(403).json({ code: 403, message: "Untente non autorizzato" });
+        return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
     }
 };
 
@@ -399,13 +401,13 @@ const cancellaUtente = (req, res) => {
 
 //esporto le funzioni per poterle chiamare dalle route
 module.exports = {
+    listaUtenti,
     loginUtente,
     registrazione,
+    confermaUtente,
     getUtenteConEmail,
     getUtenteConToken,
     getUtenteConID,
-    listaUtenti,
     modificaUtente,
     cancellaUtente,
-    confermaUtente,
 };

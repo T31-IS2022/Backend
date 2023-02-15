@@ -92,7 +92,7 @@ const getDisponibilita = (req, res) => {
             }
             const dataInizio = new Date(inizio);
             const dataFine = new Date(fine);
-            //
+
             Ricorrenza.count({
                 inizio: { $lt: dataFine },
                 fine: { $gt: dataInizio },
@@ -102,13 +102,13 @@ const getDisponibilita = (req, res) => {
                     if (numero == 0) {
                         return res.status(200).json({
                             code: 200,
-                            dispobinilita: true,
+                            disponibilita: true,
                             message: `Il servizio ${id} è diponibile nel periodo tra ${inizio} e ${fine}`,
                         });
                     } else {
                         return res.status(200).json({
                             code: 200,
-                            dispobinilita: false,
+                            disponibilita: false,
                             message: `Il servizio ${id} NON è diponibile nel periodo tra ${inizio} e ${fine}`,
                         });
                     }
@@ -188,7 +188,7 @@ const modifica = (req, res) => {
     Servizio.findOne({ _id: ObjectId(id) })
         .then((data) => {
             if (!data)
-                return res.status(400).json({
+                return res.status(404).json({
                     message: `L'id ${id} non è associato ad alcun servizio`,
                 });
             data.nome = nome || data.nome;

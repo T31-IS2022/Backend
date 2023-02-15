@@ -15,9 +15,11 @@ console.log("Application started");
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 app.use(cp());
-app.use(cors({
-    origin: [process.env.FRONTEND_ADDR]
-}));
+app.use(
+    cors({
+        origin: [process.env.FRONTEND_ADDR],
+    })
+);
 
 app.use("/images", express.static("images"));
 
@@ -39,7 +41,7 @@ app.use("/utente", routesUtente);
 //route per la documentazione fornita da Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(express.static('../images'))
+app.use(express.static("../images"));
 
 //metto express in ascolto sulla porta specificata nel file .env
 const PORT = process.env.PORT || 3000;
