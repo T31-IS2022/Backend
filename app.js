@@ -13,7 +13,7 @@ const swaggerDocument = require("./swagger.json");
 console.log("Application started");
 
 const FRONTEND_ADDR = process.env.FRONTEND_ADDR;
-console.log(`aloowed origin: ${FRONTEND_ADDR}`)
+console.log(`allowed origin: ${FRONTEND_ADDR}`)
 app.use(cors({
     origin: [FRONTEND_ADDR]
 }));

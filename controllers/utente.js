@@ -186,12 +186,12 @@ const registrazione = (req, res) => {
                     text: emailTemplates.textEmailConferma(
                         //nome,`${process.env.WEB_ADDR}/utente/conferma?id=${id}`
                         nome,
-                        `${process.env.FRONTEND_ADDR}/conferma.html?id=${id}`
+                        `${process.env.FRONTEND_ADDR}/Frontend/conferma.html?id=${id}`
                     ),
                     html: emailTemplates.htmlEmailConferma(
                         //nome, `${process.env.WEB_ADDR}/utente/conferma?id=${id}`
                         nome,
-                        `${process.env.FRONTEND_ADDR}/conferma.html?id=${id}`
+                        `${process.env.FRONTEND_ADDR}/Frontend/conferma.html?id=${id}`
                     ),
                 })
                 .then((info) => {
