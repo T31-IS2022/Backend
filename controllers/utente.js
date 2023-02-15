@@ -231,7 +231,22 @@ const getUtenteConEmail = (req, res) => {
             return res.status(200).json(data); //se trovo l'oggetto lo restituisco
         });
     } else {
-        return res.start(403).json({ code: 403, message: "Untente non autorizzato" });
+        return res.status(403).json({ code: 403, message: "Untente non autorizzato" });
+    }
+};
+
+const getUtenteConToken = (req, res) => {
+    console.log(
+        "Richiesto un utente tramite token\n\tQuery: " +
+            JSON.stringify(req.query) +
+            "\n\tParametri: " +
+            JSON.stringify(req.params)
+    );
+
+    if (req.utente) {
+        return res.status(200).json(req.utente);
+    } else {
+        return res.status(403).json({ code: 403, message: "Untente non autorizzato" });
     }
 };
 
@@ -387,6 +402,7 @@ module.exports = {
     loginUtente,
     registrazione,
     getUtenteConEmail,
+    getUtenteConToken,
     getUtenteConID,
     listaUtenti,
     modificaUtente,

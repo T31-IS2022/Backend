@@ -15,6 +15,7 @@ const controllerUtente = require("../controllers/utente");
 router.post("/login", upload.none(), controllerUtente.loginUtente);
 router.post("/registrazione", upload.single("foto"), controllerUtente.registrazione);
 router.get("/byEmail", tokenChecker(1), controllerUtente.getUtenteConEmail);
+router.get("/byToken", tokenChecker(1), controllerUtente.getUtenteConToken);
 router.get("/byID", tokenChecker(2), controllerUtente.getUtenteConID);
 router.get("/", tokenChecker(2), controllerUtente.listaUtenti);
 router.patch("/:id", tokenChecker(1), upload.single("foto"), controllerUtente.modificaUtente);
