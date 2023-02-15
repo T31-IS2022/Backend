@@ -12,10 +12,10 @@ const swaggerDocument = require("./swagger.json");
 
 console.log("Application started");
 
+app.use(cors());
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 app.use(cp());
-app.use(cors());
 
 app.use("/images", express.static("images"));
 
