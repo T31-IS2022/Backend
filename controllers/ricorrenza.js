@@ -153,7 +153,10 @@ const eliminaRicorrenza = (req, res) => {
                 message: "La ricorrenza non esiste",
             });
         } else {
-            return res.status(200).json(data);
+            return res.status(200).json({
+                code: 200,
+                message: "Ricorrenza eliminata correttamente",
+            });
         }
     });
 };
