@@ -297,9 +297,6 @@ const eliminaPrenotazione = (req, res) => {
 
     let id = req.params.id;
 
-    if (req.utente.livello < 2 && req.utente._id != id)
-        return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
-
     Prenotazione.findOne({ _id: ObjectId(id) }, (err, data) => {
         if (err) return res.status(500).json({ code: 500, message: err });
         if (!data)
@@ -307,6 +304,14 @@ const eliminaPrenotazione = (req, res) => {
                 code: 404,
                 message: "La prenotazione non esiste",
             });
+
+        if (req.utente.livello < 2 && !req.utente._id.equals(data.proprietario)){
+            console.log(req.utente._id);
+            console.log(data.proprietario);
+            console.log(typeof req.utente._id)
+            return res.status(403).json({ code: 403, message: "Utente non autorizzato" });
+        }
+
 
         const ricorrenze = data.ricorrenze;
         Ricorrenza.deleteMany({ _id: { $in: ricorrenze } })
