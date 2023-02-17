@@ -37,7 +37,7 @@
             "description": "API per le ricorrenze del sistema"
         }
     ],
-    "schemes": ["http", "https"],
+    "schemes": ["https"],
     "paths": {
         "/utente/registrazione": {
             "post": {
@@ -1550,6 +1550,73 @@
                         "schema": { "$ref": "#/definitions/ErroreAPI" }
                     }
                 }
+            },
+            "get": {
+                "tags": ["prenotazione"],
+                "summary": "Ottenere la lista delle prenotazioni presenti nel sistema",
+                "description": "",
+                "operationId": "listaPrenotazioni",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "description": "Indice del primo oggetto da restituire",
+                        "type": "integer",
+                        "required": false
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Numero di oggetti da restituire",
+                        "type": "integer",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/Prenotazione" }
+                        }
+                    },
+                    "204": {
+                        "description": "No content - Nessuna prenotazione da restituire",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 204
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Nessuna prenotazione da restituire"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I valori di start e count non sono coerenti",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    }
+                }
             }
         },
         "/prenotazione/byUtente": {
@@ -1754,34 +1821,10 @@
                     {
                         "name": "ricorrenze",
                         "in": "formData",
-                        "description": "Lista di ricorrenze legate a questa prenotazione",
+                        "description": "Lista di ID di ricorrenze legate a questa prenotazione",
                         "type": "array",
                         "items": {
-                            "type": "object",
-                            "properties": {
-                                "inizio": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                    "description": "Data e ora di inizio della ricorrenza"
-                                },
-                                "fine": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                    "description": "Data e ora di fine della ricorrenza"
-                                },
-                                "spaziPrenotati": {
-                                    "type": "array",
-                                    "items": { "type": "string" },
-                                    "description": "Lista di ID degli spazi utilizzati in questa ricorrenza",
-                                    "example": ""
-                                },
-                                "serviziPrenotati": {
-                                    "type": "array",
-                                    "items": { "type": "string" },
-                                    "description": "Lista di ID dei servizi utilizzati in questa ricorrenza",
-                                    "example": ""
-                                }
-                            }
+                            "type": "string"
                         },
                         "required": true
                     }
@@ -1835,7 +1878,21 @@
                 "responses": {
                     "200": {
                         "description": "OK - Eliminazione della prenotazione effettuata correttamente",
-                        "schema": { "$ref": "#/definitions/Prenotazione" }
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 200
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Prenotazione eliminata correttamente"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
@@ -1847,6 +1904,75 @@
                     },
                     "404": {
                         "description": "Not found - Una prenotazione con l'ID fornito non esiste",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "500": {
+                        "description": "Internal server error - Errore imprevisto durante l'operazione",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    }
+                }
+            }
+        },
+        "/ricorrenza": {
+            "get": {
+                "tags": ["ricorrenza"],
+                "summary": "Ottenere la lista delle ricorrenze presenti nel sistema",
+                "description": "",
+                "operationId": "listaRicorrenze",
+                "consumes": [],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "description": "Indice del primo oggetto da restituire",
+                        "type": "integer",
+                        "required": false
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Numero di oggetti da restituire",
+                        "type": "integer",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/Ricorrenza" }
+                        }
+                    },
+                    "204": {
+                        "description": "No content - Nessuna ricorrenza da restituire",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 204
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Nessuna ricorrenza da restituire"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - I valori di start e count non sono coerenti",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Per svolgere l'operazione è necessario il login",
+                        "schema": { "$ref": "#/definitions/ErroreAPI" }
+                    },
+                    "403": {
+                        "description": "Forbidden - Il livello di privilegio non è sufficiente",
                         "schema": { "$ref": "#/definitions/ErroreAPI" }
                     },
                     "500": {
@@ -2073,7 +2199,21 @@
                 "responses": {
                     "200": {
                         "description": "OK - Eliminazione della ricorrenza effettuata correttamente",
-                        "schema": { "$ref": "#/definitions/Ricorrenza" }
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "description": "Codice di risposta HTTP",
+                                    "example": 200
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Messaggio con esito dell'operazione",
+                                    "example": "Ricorrenza eliminata correttamente"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized - Per svolgere l'operazione è necessario il login",

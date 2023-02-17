@@ -313,7 +313,10 @@ const eliminaPrenotazione = (req, res) => {
             .then((data) => {
                 Prenotazione.findOneAndDelete({ _id: ObjectId(id) }, (err, data) => {
                     if (err) return res.status(500).json({ code: 500, message: err });
-                    return res.status(200).json(data);
+                    return res.status(200).json({
+                        code: 200,
+                        message: "Prenotazione eliminata correttamente",
+                    });
                 });
             })
             .catch((err) => {
