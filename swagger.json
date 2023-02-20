@@ -3,7 +3,7 @@
     "info": {
         "version": "1.0.0",
         "title": "Progetto Gruppo T31 - IS2022",
-        "description": "API del progetto del Gruppo T31 svolto durente il corso di Ingegneria del software - Anno Accademico 2022/23",
+        "description": "API del progetto del Gruppo T31 svolto durente il corso di Ingegneria del software - Anno Accademico 2022/23\nNB: per utilizzare le API che richiedono un utente di segreteria, usare l'API login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
         "contact": {
             "name": "Luca Dematté - Referente gruppo T31",
             "email": "luca.dematte-2@studenti.unitn.it"
@@ -123,7 +123,7 @@
             "post": {
                 "tags": ["utente"],
                 "summary": "Accesso al sistema",
-                "description": "",
+                "description": "NB: per utilizzare le API che richiedono un utente di segreteria, fare il login con questa API usando l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "login",
                 "consumes": ["multipart/form-data"],
                 "produces": ["application/json"],
@@ -227,7 +227,7 @@
             "get": {
                 "tags": ["utente"],
                 "summary": "Ottenere la lista degli utenti presenti nel sistema",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "listaUtenti",
                 "consumes": [],
                 "produces": ["application/json"],
@@ -301,7 +301,7 @@
             "get": {
                 "tags": ["utente"],
                 "summary": "Ottenere un utente tramite il suo ID",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "getUtenteConID",
                 "consumes": [],
                 "produces": ["application/json"],
@@ -627,7 +627,7 @@
             "post": {
                 "tags": ["spazio"],
                 "summary": "Creazione di un nuovo spazio",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "nuovoSpazio",
                 "consumes": ["multipart/form-data"],
                 "produces": ["application/json"],
@@ -885,7 +885,7 @@
             "patch": {
                 "tags": ["spazio"],
                 "summary": "Modifica di uno spazio",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "modificaSpazio",
                 "consumes": ["multipart/form-data"],
                 "produces": ["application/json"],
@@ -988,7 +988,7 @@
             "delete": {
                 "tags": ["spazio"],
                 "summary": "Eliminazione di uno spazio",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "eliminaSpazio",
                 "consumes": [],
                 "produces": ["application/json"],
@@ -1054,7 +1054,7 @@
             "post": {
                 "tags": ["servizio"],
                 "summary": "Creazione di un nuovo servizio",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "nuovoServizio",
                 "consumes": ["multipart/form-data"],
                 "produces": ["application/json"],
@@ -1308,7 +1308,7 @@
             "patch": {
                 "tags": ["servizio"],
                 "summary": "Modifica di un servizio",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "modificaServizio",
                 "consumes": ["multipart/form-data"],
                 "produces": ["application/json"],
@@ -1403,7 +1403,7 @@
             "delete": {
                 "tags": ["servizio"],
                 "summary": "Eliminazione di un servizio",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "eliminaServizio",
                 "consumes": [],
                 "produces": ["application/json"],
@@ -1554,7 +1554,7 @@
             "get": {
                 "tags": ["prenotazione"],
                 "summary": "Ottenere la lista delle prenotazioni presenti nel sistema",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "listaPrenotazioni",
                 "consumes": [],
                 "produces": ["application/json"],
@@ -1917,7 +1917,7 @@
             "get": {
                 "tags": ["ricorrenza"],
                 "summary": "Ottenere la lista delle ricorrenze presenti nel sistema",
-                "description": "",
+                "description": "NB: questa API è riservata agli utenti di segreteria. Per provarla, fare il login con l'utente: \"segreteria@oratorio.com\" e password: \"password\"",
                 "operationId": "listaRicorrenze",
                 "consumes": [],
                 "produces": ["application/json"],

@@ -171,7 +171,7 @@ const htmlEmailConferma = function (nomeUtente, linkConferma) {
                             <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">Progetto Oratorio -  Ingegneria del Software 2022</span>
                             <br> Visita il nostro <a href="` +
         process.env.FRONTEND_ADDR +
-        `" style="text-decoration: underline; color: #999999; font-size: 12px; text-align: center;">sito</a>
+        `/Frontend" style="text-decoration: underline; color: #999999; font-size: 12px; text-align: center;">sito</a>
                         </td>
                         </tr>
                         <tr>
