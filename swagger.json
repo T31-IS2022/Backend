@@ -43,7 +43,7 @@
             "post": {
                 "tags": ["utente"],
                 "summary": "Creazione di un nuovo account utente",
-                "description": "",
+                "description": "NB: la creazione di un nuovo utente comporta l'invio di una email all'indirizzo specificato per effettuare la conferma. Utilizzare solo indirizzi esistenti e ai quali si ha accesso.",
                 "operationId": "registrazione",
                 "consumes": ["multipart/form-data"],
                 "produces": ["application/json"],
